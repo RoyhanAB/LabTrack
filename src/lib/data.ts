@@ -1,0 +1,63 @@
+import { Laboratory, User, Equipment, Loan, ActivityLog } from './types';
+
+export const laboratories: Laboratory[] = [
+  { id: 'lab-1', name: 'LSIPro', fullName: 'Laboratorium Sistem Informasi & Produktivitas', description: 'Laboratorium yang berfokus pada pengembangan sistem informasi industri, simulasi proses produksi, dan analisis produktivitas kerja.', location: 'Gedung F, Lantai 2, Ruang 201', image: '/labs/lsipro.jpg' },
+  { id: 'lab-2', name: 'RSK&E', fullName: 'Laboratorium Rekayasa Sistem Kerja & Ergonomi', description: 'Laboratorium yang mempelajari perancangan sistem kerja, ergonomi, dan faktor manusia dalam industri.', location: 'Gedung F, Lantai 2, Ruang 203', image: '/labs/rske.jpg' },
+  { id: 'lab-3', name: 'OSI&K', fullName: 'Laboratorium Optimasi Sistem Industri & Kualitas', description: 'Laboratorium yang fokus pada optimasi proses, pengendalian kualitas, dan statistik industri.', location: 'Gedung F, Lantai 3, Ruang 301', image: '/labs/osik.jpg' },
+  { id: 'lab-4', name: 'SMI', fullName: 'Laboratorium Sistem Manufaktur Industri', description: 'Laboratorium yang mempelajari sistem manufaktur, otomasi, dan proses produksi industri modern.', location: 'Gedung F, Lantai 3, Ruang 303', image: '/labs/smi.jpg' },
+];
+
+export const users: User[] = [
+  { id: 'usr-1', name: 'Ahmad Fauzan', email: 'ahmad.fauzan@student.untirta.ac.id', password: 'mahasiswa123', role: 'mahasiswa', nim: '3333210001', kelas: 'TI-6A', createdAt: '2026-01-15T08:00:00Z' },
+  { id: 'usr-2', name: 'Siti Nurhaliza', email: 'siti.nurhaliza@student.untirta.ac.id', password: 'mahasiswa123', role: 'mahasiswa', nim: '3333210015', kelas: 'TI-6B', createdAt: '2026-01-15T08:00:00Z' },
+  { id: 'usr-3', name: 'Budi Santoso', email: 'budi.santoso@student.untirta.ac.id', password: 'mahasiswa123', role: 'mahasiswa', nim: '3333210042', kelas: 'TI-6A', createdAt: '2026-02-01T08:00:00Z' },
+  { id: 'usr-4', name: 'Rizky Pratama', email: 'rizky.pratama@untirta.ac.id', password: 'admin123', role: 'admin', createdAt: '2025-08-01T08:00:00Z' },
+  { id: 'usr-5', name: 'Dewi Anggraini', email: 'dewi.anggraini@untirta.ac.id', password: 'admin123', role: 'admin', createdAt: '2025-08-01T08:00:00Z' },
+];
+
+export const equipment: Equipment[] = [
+  { id: 'eq-1', name: 'Stopwatch Digital', description: 'Stopwatch digital presisi tinggi untuk pengukuran waktu kerja dan time study. Memiliki fitur lap time, split time, dan memori hingga 100 data.', labId: 'lab-2', totalStock: 10, availableStock: 7, condition: 'Baik', status: 'tersedia', category: 'Pengukuran Waktu', specifications: 'Resolusi: 1/100 detik, Memori: 100 lap', createdAt: '2025-06-01T00:00:00Z', updatedAt: '2026-05-10T00:00:00Z' },
+  { id: 'eq-2', name: 'Timbangan Digital Analitik', description: 'Timbangan digital presisi untuk pengukuran berat material dan produk dalam analisis kualitas.', labId: 'lab-3', totalStock: 5, availableStock: 3, condition: 'Baik', status: 'tersedia', category: 'Pengukuran Berat', specifications: 'Kapasitas: 300g, Ketelitian: 0.001g', createdAt: '2025-06-01T00:00:00Z', updatedAt: '2026-05-08T00:00:00Z' },
+  { id: 'eq-3', name: 'Jangka Sorong Digital', description: 'Alat ukur presisi untuk mengukur dimensi benda kerja seperti panjang, diameter luar, diameter dalam, dan kedalaman.', labId: 'lab-4', totalStock: 15, availableStock: 12, condition: 'Baik', status: 'tersedia', category: 'Pengukuran Dimensi', specifications: 'Range: 0-150mm, Resolusi: 0.01mm', createdAt: '2025-06-01T00:00:00Z', updatedAt: '2026-05-12T00:00:00Z' },
+  { id: 'eq-4', name: 'Multimeter Digital', description: 'Alat ukur serbaguna untuk mengukur tegangan, arus, dan hambatan listrik pada rangkaian elektronik.', labId: 'lab-4', totalStock: 8, availableStock: 5, condition: 'Baik', status: 'tersedia', category: 'Elektronik', specifications: 'DCV: 0-600V, ACV: 0-600V, DCA: 0-10A', createdAt: '2025-06-01T00:00:00Z', updatedAt: '2026-05-10T00:00:00Z' },
+  { id: 'eq-5', name: 'Lux Meter', description: 'Alat pengukur intensitas cahaya untuk analisis ergonomi lingkungan kerja dan pencahayaan ruangan.', labId: 'lab-2', totalStock: 6, availableStock: 4, condition: 'Baik', status: 'tersedia', category: 'Ergonomi', specifications: 'Range: 0-200,000 lux, Akurasi: ±3%', createdAt: '2025-06-01T00:00:00Z', updatedAt: '2026-05-09T00:00:00Z' },
+  { id: 'eq-6', name: 'Sound Level Meter', description: 'Alat ukur tingkat kebisingan untuk evaluasi lingkungan kerja dan analisis ergonomi auditori.', labId: 'lab-2', totalStock: 4, availableStock: 2, condition: 'Baik', status: 'tersedia', category: 'Ergonomi', specifications: 'Range: 30-130 dB, Frekuensi: 31.5Hz-8kHz', createdAt: '2025-06-01T00:00:00Z', updatedAt: '2026-05-11T00:00:00Z' },
+  { id: 'eq-7', name: 'Mikrometer Sekrup', description: 'Alat ukur presisi tinggi untuk pengukuran dimensi benda kerja dengan ketelitian hingga 0.001mm.', labId: 'lab-4', totalStock: 10, availableStock: 8, condition: 'Baik', status: 'tersedia', category: 'Pengukuran Dimensi', specifications: 'Range: 0-25mm, Resolusi: 0.001mm', createdAt: '2025-06-01T00:00:00Z', updatedAt: '2026-05-07T00:00:00Z' },
+  { id: 'eq-8', name: 'Thermocouple Reader', description: 'Alat pembaca suhu dengan sensor thermocouple untuk pengukuran temperatur pada proses manufaktur.', labId: 'lab-4', totalStock: 5, availableStock: 0, condition: 'Baik', status: 'dipinjam', category: 'Pengukuran Suhu', specifications: 'Range: -200°C ~ 1370°C, Tipe: K,J,T,E', createdAt: '2025-06-01T00:00:00Z', updatedAt: '2026-05-13T00:00:00Z' },
+  { id: 'eq-9', name: 'Dial Indicator', description: 'Alat ukur perpindahan linear untuk mengecek kerataan permukaan dan run-out pada benda kerja.', labId: 'lab-4', totalStock: 8, availableStock: 6, condition: 'Baik', status: 'tersedia', category: 'Pengukuran Dimensi', specifications: 'Range: 0-10mm, Resolusi: 0.01mm', createdAt: '2025-06-01T00:00:00Z', updatedAt: '2026-05-10T00:00:00Z' },
+  { id: 'eq-10', name: 'Vibration Meter', description: 'Alat ukur getaran untuk analisis mesin dan evaluasi paparan getaran pada pekerja.', labId: 'lab-2', totalStock: 3, availableStock: 1, condition: 'Baik', status: 'tersedia', category: 'Ergonomi', specifications: 'Frekuensi: 10Hz-1kHz, Aksel: 0.1-199.9 m/s²', createdAt: '2025-07-01T00:00:00Z', updatedAt: '2026-05-12T00:00:00Z' },
+  { id: 'eq-11', name: 'Force Gauge', description: 'Alat ukur gaya dorong dan tarik untuk analisis ergonomi material handling.', labId: 'lab-2', totalStock: 4, availableStock: 3, condition: 'Baik', status: 'tersedia', category: 'Ergonomi', specifications: 'Kapasitas: 500N, Resolusi: 0.1N', createdAt: '2025-07-01T00:00:00Z', updatedAt: '2026-05-08T00:00:00Z' },
+  { id: 'eq-12', name: 'Laptop Simulasi', description: 'Laptop untuk menjalankan software simulasi seperti Arena, ProModel, dan FlexSim.', labId: 'lab-1', totalStock: 20, availableStock: 15, condition: 'Baik', status: 'tersedia', category: 'Komputer', specifications: 'i7, 16GB RAM, SSD 512GB, GTX 1650', createdAt: '2025-06-01T00:00:00Z', updatedAt: '2026-05-14T00:00:00Z' },
+  { id: 'eq-13', name: 'Projector Portable', description: 'Projector portable untuk presentasi dan simulasi visual di laboratorium.', labId: 'lab-1', totalStock: 3, availableStock: 0, condition: 'Maintenance', status: 'maintenance', category: 'Presentasi', specifications: '3500 Lumens, FHD 1080p, HDMI', createdAt: '2025-06-01T00:00:00Z', updatedAt: '2026-05-13T00:00:00Z' },
+  { id: 'eq-14', name: 'Height Gauge Digital', description: 'Alat ukur ketinggian presisi untuk quality control dan inspeksi dimensi vertikal.', labId: 'lab-3', totalStock: 4, availableStock: 3, condition: 'Baik', status: 'tersedia', category: 'Pengukuran Dimensi', specifications: 'Range: 0-300mm, Resolusi: 0.01mm', createdAt: '2025-08-01T00:00:00Z', updatedAt: '2026-05-10T00:00:00Z' },
+  { id: 'eq-15', name: 'Surface Roughness Tester', description: 'Alat ukur kekasaran permukaan untuk analisis kualitas hasil proses manufaktur.', labId: 'lab-3', totalStock: 2, availableStock: 1, condition: 'Baik', status: 'tersedia', category: 'Pengukuran Kualitas', specifications: 'Parameter: Ra, Rz, Rq, Range: 0.005-16μm', createdAt: '2025-08-01T00:00:00Z', updatedAt: '2026-05-11T00:00:00Z' },
+  { id: 'eq-16', name: 'Hardness Tester', description: 'Alat uji kekerasan material untuk pengendalian kualitas produk manufaktur.', labId: 'lab-3', totalStock: 2, availableStock: 2, condition: 'Baik', status: 'tersedia', category: 'Pengukuran Kualitas', specifications: 'Skala: HRC, HRB, HRA, Beban: 60-150 kgf', createdAt: '2025-08-01T00:00:00Z', updatedAt: '2026-05-09T00:00:00Z' },
+];
+
+const now = new Date().toISOString();
+const threeDaysAgo = new Date(Date.now() - 3 * 86400000).toISOString();
+const fiveDaysAgo = new Date(Date.now() - 5 * 86400000).toISOString();
+const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString();
+const twoDaysLater = new Date(Date.now() + 2 * 86400000).toISOString();
+const fiveDaysLater = new Date(Date.now() + 5 * 86400000).toISOString();
+const oneDayLater = new Date(Date.now() + 1 * 86400000).toISOString();
+const yesterday = new Date(Date.now() - 86400000).toISOString();
+
+export const loans: Loan[] = [
+  { id: 'loan-1', userId: 'usr-1', userName: 'Ahmad Fauzan', userNim: '3333210001', userKelas: 'TI-6A', equipmentId: 'eq-1', equipmentName: 'Stopwatch Digital', labId: 'lab-2', labName: 'RSK&E', quantity: 3, borrowDate: fiveDaysAgo, returnDate: twoDaysLater, status: 'dipinjam', approvedBy: 'Rizky Pratama', approvedAt: fiveDaysAgo, createdAt: sevenDaysAgo },
+  { id: 'loan-2', userId: 'usr-2', userName: 'Siti Nurhaliza', userNim: '3333210015', userKelas: 'TI-6B', equipmentId: 'eq-6', equipmentName: 'Sound Level Meter', labId: 'lab-2', labName: 'RSK&E', quantity: 2, borrowDate: sevenDaysAgo, returnDate: yesterday, status: 'terlambat', approvedBy: 'Rizky Pratama', approvedAt: sevenDaysAgo, createdAt: sevenDaysAgo },
+  { id: 'loan-3', userId: 'usr-3', userName: 'Budi Santoso', userNim: '3333210042', userKelas: 'TI-6A', equipmentId: 'eq-8', equipmentName: 'Thermocouple Reader', labId: 'lab-4', labName: 'SMI', quantity: 5, borrowDate: threeDaysAgo, returnDate: fiveDaysLater, status: 'dipinjam', approvedBy: 'Dewi Anggraini', approvedAt: threeDaysAgo, createdAt: fiveDaysAgo },
+  { id: 'loan-4', userId: 'usr-1', userName: 'Ahmad Fauzan', userNim: '3333210001', userKelas: 'TI-6A', equipmentId: 'eq-2', equipmentName: 'Timbangan Digital Analitik', labId: 'lab-3', labName: 'OSI&K', quantity: 2, borrowDate: now, returnDate: fiveDaysLater, status: 'menunggu', createdAt: now },
+  { id: 'loan-5', userId: 'usr-2', userName: 'Siti Nurhaliza', userNim: '3333210015', userKelas: 'TI-6B', equipmentId: 'eq-12', equipmentName: 'Laptop Simulasi', labId: 'lab-1', labName: 'LSIPro', quantity: 2, borrowDate: sevenDaysAgo, returnDate: threeDaysAgo, actualReturnDate: threeDaysAgo, status: 'dikembalikan', approvedBy: 'Rizky Pratama', approvedAt: sevenDaysAgo, returnCondition: 'Baik', createdAt: sevenDaysAgo },
+  { id: 'loan-6', userId: 'usr-3', userName: 'Budi Santoso', userNim: '3333210042', userKelas: 'TI-6A', equipmentId: 'eq-3', equipmentName: 'Jangka Sorong Digital', labId: 'lab-4', labName: 'SMI', quantity: 3, borrowDate: now, returnDate: oneDayLater, status: 'menunggu', createdAt: now },
+];
+
+export const activityLogs: ActivityLog[] = [
+  { id: 'log-1', userId: 'usr-4', userName: 'Rizky Pratama', userRole: 'admin', type: 'approve', description: 'Menyetujui peminjaman Stopwatch Digital oleh Ahmad Fauzan', createdAt: fiveDaysAgo },
+  { id: 'log-2', userId: 'usr-5', userName: 'Dewi Anggraini', userRole: 'admin', type: 'approve', description: 'Menyetujui peminjaman Thermocouple Reader oleh Budi Santoso', createdAt: threeDaysAgo },
+  { id: 'log-3', userId: 'usr-1', userName: 'Ahmad Fauzan', userRole: 'mahasiswa', type: 'peminjaman', description: 'Mengajukan peminjaman Timbangan Digital Analitik (2 unit)', createdAt: now },
+  { id: 'log-4', userId: 'usr-4', userName: 'Rizky Pratama', userRole: 'admin', type: 'update_status', description: 'Mengubah status Projector Portable menjadi Maintenance', createdAt: threeDaysAgo },
+  { id: 'log-5', userId: 'usr-4', userName: 'Rizky Pratama', userRole: 'admin', type: 'approve', description: 'Menyetujui peminjaman Laptop Simulasi oleh Siti Nurhaliza', createdAt: sevenDaysAgo },
+  { id: 'log-6', userId: 'usr-2', userName: 'Siti Nurhaliza', userRole: 'mahasiswa', type: 'pengembalian', description: 'Mengembalikan Laptop Simulasi (2 unit) - Kondisi: Baik', createdAt: threeDaysAgo },
+  { id: 'log-7', userId: 'usr-3', userName: 'Budi Santoso', userRole: 'mahasiswa', type: 'peminjaman', description: 'Mengajukan peminjaman Jangka Sorong Digital (3 unit)', createdAt: now },
+];
