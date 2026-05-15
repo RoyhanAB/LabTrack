@@ -12,10 +12,10 @@ interface StoreContextType {
   loans: Loan[];
   activityLogs: ActivityLog[];
   isLoading: boolean;
-  
+
   login: (email: string) => Promise<User | null>;
   logout: () => void;
-  
+
   getEquipment: (id: string) => Equipment | undefined;
   getLab: (id: string) => Laboratory | undefined;
   getLoansByUser: (userId: string) => Loan[];
@@ -25,8 +25,8 @@ interface StoreContextType {
   notifications: Notification[];
   markNotificationAsRead: (id: string) => void;
   addNotification: (notification: Omit<Notification, 'id' | 'createdAt'>) => void;
-  
-  createLoan: (loan: Loan) => Promise<void>;
+
+  createLoan: (loan: Loan) => Promise<any>;
   updateLoanStatus: (loanId: string, status: string, additionalData?: Partial<Loan>) => Promise<void>;
   deleteEquipment: (id: string) => Promise<void>;
   updateEquipment: (id: string, data: Partial<Equipment>) => Promise<void>;
@@ -52,7 +52,20 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         // Load user from local storage to keep session
         const storedUser = localStorage.getItem('labtrack_user');
         if (storedUser) {
-          setCurrentUser(JSON.parse(storedUser));
+          try {
+            const parsed = JSON.parse(storedUser);
+            // Validate that the stored user has a proper UUID format
+            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+            if (parsed.id && uuidRegex.test(parsed.id)) {
+              setCurrentUser(parsed);
+            } else {
+              // Stale data with old format (e.g., 'usr-1'), clear it
+              console.log('⚠️ Stale user data found in localStorage, clearing...');
+              localStorage.removeItem('labtrack_user');
+            }
+          } catch {
+            localStorage.removeItem('labtrack_user');
+          }
         }
 
         // Fetch data concurrently
@@ -63,7 +76,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           supabase.from('activity_logs').select('*').order('created_at', { ascending: false })
         ]);
 
-        if (labsRes.data) setLaboratories(labsRes.data);
+        if (labsRes.data) {
+          const mappedLabs = labsRes.data.map(l => ({
+            ...l,
+            fullName: l.full_name || l.fullName,
+          }));
+          setLaboratories(mappedLabs as Laboratory[]);
+        }
         if (eqRes.data) {
           const mappedEq = eqRes.data.map(e => ({
             ...e,
@@ -104,30 +123,30 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           }));
           setActivityLogs(mappedLogs as ActivityLog[]);
         }
-        
+
         // Add some demo notifications for testing
         const demoNotifications: Notification[] = [
           {
             id: 'notif-demo-1',
-            userId: 'usr-1',
+            userId: '00000000-0000-0000-0000-000000000001',
             title: 'Peminjaman Disetujui',
-            message: 'Peminjaman Stopwatch Digital Anda telah disetujui. Silakan ambil alat di laboratorium RSK&E.',
+            message: 'Peminjaman Stopwatch Digital Pro Anda telah disetujui. Silakan ambil alat di laboratorium RSK&E.',
             type: 'success',
             read: false,
             createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() // 2 hours ago
           },
           {
             id: 'notif-demo-2',
-            userId: 'usr-1',
+            userId: '00000000-0000-0000-0000-000000000001',
             title: 'Pengingat Pengembalian',
-            message: 'Jangan lupa mengembalikan Timbangan Digital Analitik besok tanggal 16 Mei 2026.',
+            message: 'Jangan lupa mengembalikan Stopwatch Digital Pro besok tanggal 16 Mei 2026.',
             type: 'warning',
             read: false,
             createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString() // 6 hours ago
           },
           {
             id: 'notif-demo-3',
-            userId: 'usr-4',
+            userId: '00000000-0000-0000-0000-000000000003',
             title: 'Pengajuan Baru',
             message: 'Ahmad Fauzan mengajukan peminjaman Timbangan Digital Analitik. Silakan verifikasi.',
             type: 'info',
@@ -153,7 +172,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         // Re-fetch all data on change
         fetchData();
       }).subscribe();
-      
+
     const eqSub = supabase.channel('equipment_changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'equipment' }, (payload) => {
         console.log('Equipment change detected:', payload);
@@ -174,7 +193,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (loan.status === 'dipinjam' && new Date(loan.returnDate) < now) {
           // Update loan status to overdue
           updateLoanStatus(loan.id, 'terlambat');
-          
+
           // Add notification for student
           addNotification({
             userId: loan.userId,
@@ -192,23 +211,47 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [loans]);
 
   const login = async (email: string): Promise<User | null> => {
-    // Check local initial users first for demo fallback, then Supabase
-    const localUser = initialUsers.find((u: User) => u.email === email);
-    if (localUser) {
-      setCurrentUser(localUser);
-      localStorage.setItem('labtrack_user', JSON.stringify(localUser));
-      return localUser;
-    }
+    try {
+      // Always try Supabase first to get UUID
+      const { data, error } = await supabase.from('users').select('*').eq('email', email).single();
+      
+      if (data) {
+        console.log('✅ User logged in from Supabase:', data.id);
+        // Map Supabase data to our User type
+        const user: User = {
+          id: data.id,
+          name: data.name,
+          email: data.email,
+          password: '', // Password not stored in Supabase public table
+          role: data.role,
+          nim: data.nim || undefined,
+          kelas: data.kelas || undefined,
+          createdAt: data.created_at || new Date().toISOString(),
+        };
+        setCurrentUser(user);
+        localStorage.setItem('labtrack_user', JSON.stringify(user));
+        return user;
+      }
+      
+      if (error) {
+        console.log('⚠️ User not found in Supabase, checking local data');
+      }
 
-    // Try Supabase
-    const { data } = await supabase.from('users').select('*').eq('email', email).single();
-    if (data) {
-      setCurrentUser(data);
-      localStorage.setItem('labtrack_user', JSON.stringify(data));
-      return data;
+      // Fallback to local users (but these should have UUID format now)
+      const localUser = initialUsers.find((u: User) => u.email === email);
+      if (localUser) {
+        console.log('✅ User logged in from local data:', localUser.id);
+        setCurrentUser(localUser);
+        localStorage.setItem('labtrack_user', JSON.stringify(localUser));
+        return localUser;
+      }
+
+      console.log('❌ User not found');
+      return null;
+    } catch (error) {
+      console.error('❌ Login error:', error);
+      return null;
     }
-    
-    return null;
   };
 
   const logout = () => {
@@ -224,6 +267,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const createLoan = async (loan: Loan) => {
     try {
+      console.log('📝 Creating loan:', loan.id);
+      
       // Map camelCase to snake_case for DB
       const dbLoan = {
         id: loan.id,
@@ -240,22 +285,29 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         return_date: loan.returnDate,
         status: loan.status,
         notes: loan.notes,
+        letter_url: loan.letterUrl || null,
         created_at: loan.createdAt
       };
 
-      const { error } = await supabase.from('loans').insert([dbLoan]);
+      console.log('📤 Sending to Supabase:', dbLoan);
+
+      const { data, error } = await supabase.from('loans').insert([dbLoan]).select();
+      
       if (error) {
-        console.error('Error creating loan:', error);
-        throw error;
+        console.error('❌ Supabase error:', error);
+        throw new Error(`Database error: ${error.message}`);
       }
+      
+      console.log('✅ Loan created in database:', data);
       
       // Update local state immediately
       setLoans(prev => [loan, ...prev]);
       
-      console.log('Loan created successfully:', loan.id);
-    } catch (error) {
-      console.error('Failed to create loan:', error);
-      toast.error('Gagal membuat peminjaman');
+      console.log('✅ Loan created successfully:', loan.id);
+      return data;
+    } catch (error: any) {
+      console.error('❌ Failed to create loan:', error);
+      toast.error(error.message || 'Gagal membuat peminjaman');
       throw error;
     }
   };
@@ -277,7 +329,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
       // Update local state immediately
       setLoans(prev => prev.map(l => l.id === loanId ? { ...l, status: status as any, ...additionalData } : l));
-      
+
       console.log('Loan updated successfully:', loanId);
     } catch (error) {
       console.error('Failed to update loan:', error);
@@ -308,7 +360,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       if (data.availableStock !== undefined) dbUpdate.available_stock = data.availableStock;
       if (data.totalStock !== undefined) dbUpdate.total_stock = data.totalStock;
       if (data.labId !== undefined) dbUpdate.lab_id = data.labId;
-      
+
       // Remove camelCase keys
       delete dbUpdate.availableStock;
       delete dbUpdate.totalStock;

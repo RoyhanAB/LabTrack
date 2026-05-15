@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { FlaskConical, Mail, Lock, Eye, EyeOff, ArrowRight, GraduationCap, ShieldCheck } from 'lucide-react';
+import { FlaskConical, Mail, Lock, Eye, EyeOff, ArrowRight, ArrowLeft, GraduationCap, ShieldCheck } from 'lucide-react';
 import { useStore } from '@/lib/store';
 import toast from 'react-hot-toast';
 
@@ -56,6 +56,12 @@ export default function LoginPage() {
         <div className="absolute bottom-20 left-20 w-60 h-60 bg-accent-orange/8 rounded-full blur-3xl" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] border border-white/[0.03] rounded-full" />
       </div>
+
+      {/* Back button */}
+      <Link href="/" className="absolute top-4 left-6 z-10 flex items-center gap-2 px-3 py-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors text-sm font-medium">
+        <ArrowLeft className="w-4 h-4" />
+        Kembali
+      </Link>
 
       {/* Left branding panel - hidden on mobile */}
       <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-center px-16 xl:px-24">

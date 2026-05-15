@@ -109,8 +109,20 @@ CREATE POLICY "Allow public insert" ON public.users FOR INSERT WITH CHECK (true)
 CREATE POLICY "Allow public read labs" ON public.laboratories FOR SELECT USING (true);
 CREATE POLICY "Allow public read equipment" ON public.equipment FOR SELECT USING (true);
 CREATE POLICY "Allow public update equipment" ON public.equipment FOR UPDATE USING (true);
+CREATE POLICY "Allow public insert equipment" ON public.equipment FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public delete equipment" ON public.equipment FOR DELETE USING (true);
 CREATE POLICY "Allow public read loans" ON public.loans FOR SELECT USING (true);
 CREATE POLICY "Allow public insert loans" ON public.loans FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow public update loans" ON public.loans FOR UPDATE USING (true);
 CREATE POLICY "Allow public read logs" ON public.activity_logs FOR SELECT USING (true);
 CREATE POLICY "Allow public insert logs" ON public.activity_logs FOR INSERT WITH CHECK (true);
+
+-- 3. Storage Policies (Run this if you haven't set up the bucket policies yet)
+-- Create bucket if it doesn't exist
+INSERT INTO storage.buckets (id, name, public) VALUES ('equipment-images', 'equipment-images', true) ON CONFLICT DO NOTHING;
+
+-- Storage RLS Policies
+CREATE POLICY "Public Access" ON storage.objects FOR SELECT USING (bucket_id = 'equipment-images');
+CREATE POLICY "Public Insert" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'equipment-images');
+CREATE POLICY "Public Update" ON storage.objects FOR UPDATE USING (bucket_id = 'equipment-images');
+CREATE POLICY "Public Delete" ON storage.objects FOR DELETE USING (bucket_id = 'equipment-images');

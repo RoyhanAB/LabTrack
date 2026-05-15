@@ -13,6 +13,8 @@ export default function ManajemenInventarisPage() {
   const [selectedLab, setSelectedLab] = useState('all');
   const [showModal, setShowModal] = useState(false);
   const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -35,6 +37,7 @@ export default function ManajemenInventarisPage() {
 
   const openAddModal = () => {
     setEditingEquipment(null);
+    setImageFile(null);
     setFormData({
       name: '',
       description: '',
@@ -52,6 +55,7 @@ export default function ManajemenInventarisPage() {
 
   const openEditModal = (eq: Equipment) => {
     setEditingEquipment(eq);
+    setImageFile(null);
     setFormData({
       name: eq.name,
       description: eq.description,
@@ -69,8 +73,29 @@ export default function ManajemenInventarisPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsUploading(true);
     
     try {
+      let imageUrl = formData.image;
+
+      if (imageFile) {
+        const fileExt = imageFile.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('equipment-images')
+          .upload(filePath, imageFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('equipment-images')
+          .getPublicUrl(filePath);
+
+        imageUrl = publicUrl;
+      }
+
       if (editingEquipment) {
         // Update existing equipment
         const dbUpdate: any = {
@@ -83,7 +108,7 @@ export default function ManajemenInventarisPage() {
           status: formData.status,
           category: formData.category,
           specifications: formData.specifications,
-          image: formData.image
+          image: imageUrl
         };
 
         const { error } = await supabase.from('equipment').update(dbUpdate).eq('id', editingEquipment.id);
@@ -91,6 +116,7 @@ export default function ManajemenInventarisPage() {
 
         await updateEquipment(editingEquipment.id, {
           ...formData,
+          image: imageUrl,
           updatedAt: new Date().toISOString()
         });
 
@@ -117,7 +143,7 @@ export default function ManajemenInventarisPage() {
           status: formData.status,
           category: formData.category,
           specifications: formData.specifications,
-          image: formData.image,
+          image: imageUrl,
           created_at: new Date().toISOString()
         };
 
@@ -137,9 +163,11 @@ export default function ManajemenInventarisPage() {
 
       setShowModal(false);
       // Data will auto-refresh via realtime subscription
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving equipment:', error);
-      toast.error('Gagal menyimpan data alat');
+      toast.error(`Gagal menyimpan: ${error.message || 'Terjadi kesalahan'}`);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -420,14 +448,31 @@ export default function ManajemenInventarisPage() {
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-navy-700 mb-1.5">URL Gambar</label>
+                  <label className="block text-sm font-medium text-navy-700 mb-1.5">Gambar Alat</label>
                   <input 
-                    type="url" 
-                    value={formData.image}
-                    onChange={e => setFormData({...formData, image: e.target.value})}
-                    placeholder="https://example.com/image.jpg"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent-cyan/30 focus:border-accent-cyan outline-none"
+                    type="file" 
+                    accept="image/*"
+                    onChange={e => {
+                      if (e.target.files && e.target.files[0]) {
+                        setImageFile(e.target.files[0]);
+                        // Optional: Show preview logic here if needed
+                      }
+                    }}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent-cyan/30 focus:border-accent-cyan outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-accent-cyan/10 file:text-accent-cyan hover:file:bg-accent-cyan/20 cursor-pointer"
                   />
+                  {formData.image && !imageFile && (
+                    <div className="mt-3 text-sm text-gray-500 flex items-center gap-2">
+                      <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
+                        <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
+                      </div>
+                      <span>Gambar saat ini tersimpan</span>
+                    </div>
+                  )}
+                  {imageFile && (
+                    <div className="mt-3 text-sm text-accent-cyan flex items-center gap-2 font-medium">
+                      <span>✓ {imageFile.name} siap diunggah</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -441,10 +486,17 @@ export default function ManajemenInventarisPage() {
                 </button>
                 <button 
                   type="submit"
-                  className="flex-1 py-3 rounded-xl bg-accent-cyan text-white font-bold hover:bg-accent-cyan-dark shadow-lg shadow-accent-cyan/20 transition-all flex items-center justify-center gap-2"
+                  disabled={isUploading}
+                  className="flex-1 py-3 rounded-xl bg-accent-cyan text-white font-bold hover:bg-accent-cyan-dark shadow-lg shadow-accent-cyan/20 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  <Save className="w-4 h-4" />
-                  {editingEquipment ? 'Simpan Perubahan' : 'Tambah Alat'}
+                  {isUploading ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      {editingEquipment ? 'Simpan Perubahan' : 'Tambah Alat'}
+                    </>
+                  )}
                 </button>
               </div>
             </form>

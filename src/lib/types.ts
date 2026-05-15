@@ -8,12 +8,12 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  password: string;
+  password?: string;
   role: UserRole;
   nim?: string;
   kelas?: string;
   avatar?: string;
-  createdAt: string;
+  createdAt?: string;
 }
 
 export interface Laboratory {

@@ -3,6 +3,7 @@ import { useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useStore } from '@/lib/store';
+import { supabase } from '@/lib/supabase';
 import { ArrowLeft, Package, Calendar, Clock, Info, CheckCircle2, AlertCircle, FileText, Upload } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
@@ -55,9 +56,14 @@ export default function DetailAlatPage({ params }: { params: Promise<{ id: strin
       const loanId = `loan-${Date.now()}`;
       const letterUrl = uploadedFile ? `uploads/${uploadedFile.name}` : undefined;
       
+      // User ID should already be UUID from login
+      const userUuid = currentUser.id;
+      
+      console.log('📝 Creating loan with user ID:', userUuid);
+      
       await createLoan({
         id: loanId,
-        userId: currentUser.id,
+        userId: userUuid,
         userName: currentUser.name,
         userNim: currentUser.nim || '',
         userKelas: currentUser.kelas || '',
@@ -76,7 +82,7 @@ export default function DetailAlatPage({ params }: { params: Promise<{ id: strin
 
       // Add notification for user
       addNotification({
-        userId: currentUser.id,
+        userId: userUuid,
         title: 'Pengajuan Dikirim',
         message: `Pengajuan peminjaman ${eq.name} berhasil dikirim. Menunggu persetujuan admin.`,
         type: 'info',
@@ -84,7 +90,7 @@ export default function DetailAlatPage({ params }: { params: Promise<{ id: strin
       });
 
       addActivityLog({
-        userId: currentUser.id,
+        userId: userUuid,
         userName: currentUser.name,
         userRole: 'mahasiswa',
         type: 'peminjaman',
@@ -97,9 +103,9 @@ export default function DetailAlatPage({ params }: { params: Promise<{ id: strin
       setTimeout(() => {
         router.push('/mahasiswa/status');
       }, 500);
-    } catch (error) {
-      console.error('Error creating loan:', error);
-      toast.error('Gagal mengirim pengajuan. Silakan coba lagi.');
+    } catch (error: any) {
+      console.error('❌ Error creating loan:', error);
+      toast.error(error.message || 'Gagal mengirim pengajuan. Silakan coba lagi.');
     }
   };
 

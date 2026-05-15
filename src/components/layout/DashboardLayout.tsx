@@ -2,9 +2,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  FlaskConical, Menu, X, LogOut, Bell, Search, 
-  LayoutDashboard, PackageSearch, ClipboardList, 
+import {
+  FlaskConical, Menu, X, LogOut, Bell, Search,
+  LayoutDashboard, PackageSearch, ClipboardList,
   History, Settings, Users, Activity, FileText, Check, Trash2
 } from 'lucide-react';
 import { useStore } from '@/lib/store';
@@ -123,7 +123,7 @@ export default function DashboardLayout({ children, role }: { children: React.Re
             <X className="w-5 h-5" />
           </button>
         </div>
-        
+
         <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
           {menuItems.map(item => {
             const active = pathname === item.href || (item.href !== `/${role}` && pathname.startsWith(item.href));
@@ -160,7 +160,7 @@ export default function DashboardLayout({ children, role }: { children: React.Re
 
           <div className="flex items-center gap-3 sm:gap-5">
             <div className="relative notification-dropdown">
-              <button 
+              <button
                 onClick={() => setNotifOpen(!notifOpen)}
                 className="relative p-2 rounded-full text-gray-500 hover:bg-white hover:text-navy-800 transition-colors"
               >
@@ -178,7 +178,7 @@ export default function DashboardLayout({ children, role }: { children: React.Re
                   <div className="p-4 border-b border-gray-100 flex items-center justify-between">
                     <h3 className="font-bold text-navy-800">Notifikasi</h3>
                     {unreadNotifs > 0 && (
-                      <button 
+                      <button
                         onClick={handleMarkAllAsRead}
                         className="text-xs text-accent-cyan hover:text-accent-cyan-dark font-medium"
                       >
@@ -186,7 +186,7 @@ export default function DashboardLayout({ children, role }: { children: React.Re
                       </button>
                     )}
                   </div>
-                  
+
                   <div className="max-h-80 overflow-y-auto">
                     {userNotifications.length === 0 ? (
                       <div className="p-6 text-center text-gray-500">
@@ -197,22 +197,21 @@ export default function DashboardLayout({ children, role }: { children: React.Re
                       userNotifications.map(notif => (
                         <div key={notif.id} className={`p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors ${!notif.read ? 'bg-blue-50/30' : ''}`}>
                           <div className="flex items-start gap-3">
-                            <div className={`w-2 h-2 rounded-full mt-2 shrink-0 ${
-                              notif.type === 'success' ? 'bg-success' :
-                              notif.type === 'warning' ? 'bg-warning' :
-                              notif.type === 'danger' ? 'bg-danger' : 'bg-info'
-                            }`} />
+                            <div className={`w-2 h-2 rounded-full mt-2 shrink-0 ${notif.type === 'success' ? 'bg-success' :
+                                notif.type === 'warning' ? 'bg-warning' :
+                                  notif.type === 'danger' ? 'bg-danger' : 'bg-info'
+                              }`} />
                             <div className="flex-1 min-w-0">
                               <h4 className="font-medium text-navy-800 text-sm">{notif.title}</h4>
                               <p className="text-xs text-gray-600 mt-1 leading-relaxed">{notif.message}</p>
                               <p className="text-xs text-gray-400 mt-2">
-                                {new Date(notif.createdAt).toLocaleString('id-ID', { 
-                                  day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' 
+                                {new Date(notif.createdAt).toLocaleString('id-ID', {
+                                  day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
                                 })}
                               </p>
                             </div>
                             {!notif.read && (
-                              <button 
+                              <button
                                 onClick={() => handleMarkAsRead(notif.id)}
                                 className="p-1 rounded text-gray-400 hover:text-accent-cyan transition-colors"
                               >
