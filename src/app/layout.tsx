@@ -1,19 +1,25 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Inter } from "next/font/google";
+import { Barlow_Condensed, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { StoreProvider } from "@/lib/store";
 import { Toaster } from "react-hot-toast";
 
-const plusJakarta = Plus_Jakarta_Sans({
-  variable: "--font-heading",
+const barlowCondensed = Barlow_Condensed({
+  variable: "--font-display",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
+  weight: ["400", "600", "700", "800", "900"],
 });
 
 const inter = Inter({
   variable: "--font-body",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-mono",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -28,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className={`${plusJakarta.variable} ${inter.variable}`}>
+    <html lang="id" className={`${barlowCondensed.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
       <body className="min-h-screen antialiased">
         <StoreProvider>
           {children}
@@ -37,15 +43,15 @@ export default function RootLayout({
             toastOptions={{
               duration: 4000,
               style: {
-                background: '#1a2332',
-                color: '#f0f3f9',
-                borderRadius: '12px',
-                border: '1px solid rgba(255,255,255,0.1)',
+                background: '#0C1829',
+                color: '#E8EDF5',
+                borderRadius: '10px',
+                border: '1px solid rgba(0,201,173,0.15)',
                 padding: '12px 16px',
                 fontSize: '14px',
                 fontFamily: 'var(--font-body)',
               },
-              success: { iconTheme: { primary: '#10b981', secondary: '#fff' } },
+              success: { iconTheme: { primary: '#00C9AD', secondary: '#060D1A' } },
               error: { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
             }}
           />

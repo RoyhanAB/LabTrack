@@ -2,14 +2,22 @@
 import { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useStore } from '@/lib/store';
-import { History, Search, ArrowRightLeft, Calendar } from 'lucide-react';
+import { History, Search, ArrowRightLeft, Calendar, X, CheckCircle2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
 export default function PengembalianPage() {
-  const { getActiveLoans, updateLoanStatus, currentUser, addActivityLog, getEquipment, updateEquipment, isLoading } = useStore();
+  const { getActiveLoans, updateLoanStatus, currentUser, addActivityLog, getEquipment, updateEquipment, addNotification, isLoading } = useStore();
   const [search, setSearch] = useState('');
+  
+  // Return modal state
+  const [showReturnModal, setShowReturnModal] = useState(false);
+  const [returnTarget, setReturnTarget] = useState<{
+    loanId: string; equipmentId: string; quantity: number; eqName: string; userName: string; userId: string;
+  } | null>(null);
+  const [returnCondition, setReturnCondition] = useState('Baik');
+  const [returnNotes, setReturnNotes] = useState('');
   
   const activeLoans = getActiveLoans().sort((a, b) => new Date(a.borrowDate).getTime() - new Date(b.borrowDate).getTime());
   
@@ -19,11 +27,16 @@ export default function PengembalianPage() {
     l.id.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleReturn = async (loanId: string, equipmentId: string, quantity: number, eqName: string, userName: string) => {
-    if (!confirm(`Konfirmasi pengembalian ${eqName} dari ${userName}?`)) return;
+  const openReturnModal = (loanId: string, equipmentId: string, quantity: number, eqName: string, userName: string, userId: string) => {
+    setReturnTarget({ loanId, equipmentId, quantity, eqName, userName, userId });
+    setReturnCondition('Baik');
+    setReturnNotes('');
+    setShowReturnModal(true);
+  };
 
-    const condition = prompt(`Masukkan kondisi alat saat dikembalikan (Contoh: Baik, Rusak, Hilang 1 unit):`, 'Baik');
-    if (condition === null) return; // Cancelled
+  const handleReturn = async () => {
+    if (!returnTarget) return;
+    const { loanId, equipmentId, quantity, eqName, userName, userId } = returnTarget;
 
     try {
       const eq = getEquipment(equipmentId);
@@ -36,8 +49,8 @@ export default function PengembalianPage() {
 
       await updateLoanStatus(loanId, 'dikembalikan', { 
         actualReturnDate: new Date().toISOString(),
-        returnCondition: condition,
-        returnNotes: `Diterima oleh ${currentUser!.name}`
+        returnCondition: returnCondition,
+        returnNotes: returnNotes || `Diterima oleh ${currentUser!.name}`
       });
       
       addActivityLog({
@@ -45,10 +58,21 @@ export default function PengembalianPage() {
         userName: currentUser!.name,
         userRole: 'admin',
         type: 'pengembalian',
-        description: `Menerima pengembalian ${eqName} (${quantity} unit) dari ${userName}. Kondisi: ${condition}`
+        description: `Menerima pengembalian ${eqName} (${quantity} unit) dari ${userName}. Kondisi: ${returnCondition}`
+      });
+
+      // Notify the student
+      addNotification({
+        userId: userId,
+        title: 'Pengembalian Diterima',
+        message: `Pengembalian ${eqName} telah diterima oleh ${currentUser!.name}. Kondisi: ${returnCondition}.`,
+        type: 'success',
+        read: false
       });
 
       toast.success('Pengembalian berhasil diproses');
+      setShowReturnModal(false);
+      setReturnTarget(null);
     } catch (error) {
       console.error('Error processing return:', error);
       toast.error('Gagal memproses pengembalian');
@@ -130,7 +154,7 @@ export default function PengembalianPage() {
                       <td className="py-4 px-6">
                         <div className="flex justify-end">
                           <button 
-                            onClick={() => handleReturn(loan.id, loan.equipmentId, loan.quantity, loan.equipmentName, loan.userName)}
+                            onClick={() => openReturnModal(loan.id, loan.equipmentId, loan.quantity, loan.equipmentName, loan.userName, loan.userId)}
                             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-navy-800 text-white text-sm font-bold hover:bg-navy-700 shadow-sm transition-colors"
                           >
                             <ArrowRightLeft className="w-4 h-4" />
@@ -146,6 +170,71 @@ export default function PengembalianPage() {
           </table>
         </div>
       </div>
+
+      {/* Return Confirmation Modal */}
+      {showReturnModal && returnTarget && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-scale-in">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <h3 className="text-lg font-bold text-navy-800 font-[family-name:var(--font-heading)]">Konfirmasi Pengembalian</h3>
+              <button onClick={() => { setShowReturnModal(false); setReturnTarget(null); }} className="p-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-5">
+              <div className="bg-navy-50 rounded-xl p-4 border border-navy-100">
+                <div className="text-xs text-navy-500 mb-1">Alat Dikembalikan</div>
+                <div className="font-bold text-navy-800 text-lg">{returnTarget.eqName}</div>
+                <div className="text-sm text-navy-600 mt-1">{returnTarget.quantity} unit dari {returnTarget.userName}</div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-navy-700 mb-1.5">Kondisi Alat Saat Dikembalikan</label>
+                <select
+                  value={returnCondition}
+                  onChange={e => setReturnCondition(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent-cyan/30 focus:border-accent-cyan outline-none appearance-none bg-white"
+                >
+                  <option value="Baik">Baik — Tidak ada kerusakan</option>
+                  <option value="Rusak Ringan">Rusak Ringan — Masih bisa digunakan</option>
+                  <option value="Rusak Berat">Rusak Berat — Perlu perbaikan</option>
+                  <option value="Hilang">Hilang — Alat tidak dikembalikan</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-navy-700 mb-1.5">Catatan Tambahan (Opsional)</label>
+                <textarea
+                  rows={2}
+                  value={returnNotes}
+                  onChange={e => setReturnNotes(e.target.value)}
+                  placeholder="Catatan kondisi detail, dll..."
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent-cyan/30 focus:border-accent-cyan outline-none resize-none"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => { setShowReturnModal(false); setReturnTarget(null); }}
+                  className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-700 font-bold hover:bg-gray-50 transition-colors"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={handleReturn}
+                  className="flex-1 py-3 rounded-xl bg-success text-white font-bold hover:bg-success/90 shadow-md shadow-success/20 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  Konfirmasi
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }

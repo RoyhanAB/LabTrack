@@ -5,6 +5,184 @@ All notable changes to LabTrack project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+---
+
+## [2.0.0] - 2026-05-17
+
+### 🚀 Added - Security & Super Admin
+
+**Sistem Registrasi Mahasiswa**
+- Halaman registrasi di `/register`
+- Validasi email domain `@student.untirta.ac.id`
+- Validasi NIM Teknik Industri (format: `3333YYXXXX`)
+  - `33` = Fakultas Teknik
+  - `33` = Teknik Industri
+  - `YY` = Tahun angkatan (00-99)
+  - `XXXX` = Nomor urut (0001-9999)
+- Password hashing dengan SHA-256
+- Validasi password strength (weak/medium/strong)
+- Real-time form validation
+- Error handling yang informatif
+
+**Super Admin Dashboard**
+- Role baru: `super_admin`
+- Dashboard di `/super-admin`
+- Kelola semua user (mahasiswa, admin, super admin)
+- CRUD operations untuk user management:
+  - Create user baru dengan validasi
+  - Read/View semua user dengan pagination
+  - Update user data dan password
+  - Delete user (dengan proteksi self-delete)
+- Search users by nama, email, atau NIM
+- Filter users by role
+- Statistik user real-time:
+  - Total users
+  - Total mahasiswa
+  - Total admin/asisten
+  - Total super admin
+- Modal forms untuk create/edit user
+- Activity logging untuk semua aksi
+
+**Auth Utilities** (`src/lib/auth.ts`)
+- `hashPassword()` - Hash password dengan SHA-256
+- `verifyPassword()` - Verifikasi password terhadap hash
+- `validateEmailDomain()` - Validasi domain email UNTIRTA
+- `validateNIMTeknikIndustri()` - Validasi format NIM dengan error messages
+- `validatePasswordStrength()` - Cek kekuatan password
+- `parseNIM()` - Extract info dari NIM (fakultas, prodi, angkatan, no urut)
+- `generateEmailFromNIM()` - Generate email dari NIM dan nama
+
+**Database Updates**
+- Kolom `password_hash` di tabel users
+- Kolom `email_verified` di tabel users  
+- Kolom `last_login` di tabel users
+- Function `validate_nim_teknik_industri()` untuk validasi NIM
+- Constraint untuk validasi NIM di database level
+- Super admin user default (email: superadmin@untirta.ac.id)
+- Indexes untuk performance (email, nim, role)
+- Updated RLS policies untuk security
+
+### 🔄 Changed
+
+**Login System**
+- Login sekarang membutuhkan email + password (bukan hanya email)
+- Hapus tombol "Demo Mahasiswa" dan "Demo Admin" dari UI
+- Tambah link "Daftar Sekarang" untuk registrasi
+- Redirect super admin ke `/super-admin` setelah login
+- Last login tracking otomatis
+- Activity log untuk setiap login
+
+**User Type & Interfaces**
+- Update `UserRole` type: tambah `'super_admin'`
+- Tambah interface `RegisterData` untuk registrasi
+- Update `User` interface dengan field baru:
+  - `passwordHash?: string`
+  - `emailVerified?: boolean`
+  - `lastLogin?: string`
+- Update `ActivityType` dengan: `'register' | 'tambah_user' | 'hapus_user' | 'edit_user'`
+
+**Store Context** (`src/lib/store.tsx`)
+- Update `login()` function dengan parameter password
+- Tambah `register()` function untuk registrasi mahasiswa
+- Tambah `getAllUsers()` function untuk fetch semua user
+- Tambah `createUser()` function untuk super admin
+- Tambah `updateUser()` function untuk super admin
+- Tambah `deleteUser()` function untuk super admin
+- Tambah state `users` untuk menyimpan list user
+- Password verification saat login
+- Activity logging untuk user management
+
+**Dashboard Layout** (`src/components/layout/DashboardLayout.tsx`)
+- Support role `super_admin`
+- Auto-detect role dari currentUser
+- Menu items untuk super admin:
+  - Dashboard
+  - Kelola User
+  - Activity Log
+- Flexible role prop (optional)
+
+**Demo Accounts**
+- Update password semua demo accounts
+- Tambah super admin account
+- Dokumentasi password di README
+
+### 🔒 Security Improvements
+
+- Password hashing untuk semua user (SHA-256)
+- Validasi email domain UNTIRTA (mahasiswa & admin)
+- Validasi NIM Teknik Industri dengan constraint
+- Last login tracking untuk audit
+- Activity logging untuk user management
+- Protected routes dengan role checking
+- Self-delete protection untuk super admin
+- Email uniqueness validation
+- NIM uniqueness validation
+
+### 📝 Documentation
+
+- Tambah `docs/UPDATE_V2.md` - Dokumentasi lengkap update v2.0
+- Update `README.md` dengan:
+  - Info registrasi mahasiswa
+  - Super admin account
+  - Password requirements
+  - NIM format explanation
+- Update `docs/CHANGELOG.md` dengan semua perubahan v2.0
+- Tambah comments di code untuk complex logic
+- Database migration guide
+
+### ⚠️ Breaking Changes
+
+- **Login requires password**: Tidak bisa login hanya dengan email
+- **Demo buttons removed**: Tombol demo di UI dihapus
+- **Database schema update required**: Harus run `database/update-schema-v2.sql`
+- **Password field required**: Semua user harus punya password
+- **Email validation**: Email harus sesuai domain UNTIRTA
+- **NIM validation**: NIM mahasiswa harus format `3333YYXXXX`
+
+### 🐛 Bug Fixes
+
+- Fixed login without password validation
+- Fixed role-based routing untuk super admin
+- Fixed user creation without email validation
+- Fixed NIM format acceptance (sekarang strict)
+- Fixed dashboard layout role detection
+
+### 🔧 Technical Improvements
+
+- Better error handling di registrasi
+- Improved validation messages
+- Cleaner code structure untuk auth
+- Type safety untuk RegisterData
+- Optimized user queries dengan indexes
+- Better state management untuk users list
+
+### 📚 Known Limitations
+
+- Password hashing menggunakan SHA-256 (client-side)
+  - Untuk production, sebaiknya gunakan bcrypt (server-side)
+- Email verification belum implemented
+  - Saat ini auto-verified setelah registrasi
+- Password reset belum ada
+  - Harus contact super admin untuk reset
+- File upload masih simulasi
+- Export PDF menggunakan window.print()
+- Notifications tidak persist ke database
+
+### 🔮 Planned Features (v2.1.0)
+
+- [ ] Email verification flow
+- [ ] Forgot password functionality
+- [ ] Password reset via email
+- [ ] Bcrypt password hashing (server-side)
+- [ ] Two-factor authentication (2FA)
+- [ ] Session timeout
+- [ ] Password change history
+- [ ] Account lockout after failed attempts
+- [ ] IP-based access control
+- [ ] Audit log untuk security events
+
+---
+
 ## [1.0.0] - 2026-05-15
 
 ### 🎉 Initial Release

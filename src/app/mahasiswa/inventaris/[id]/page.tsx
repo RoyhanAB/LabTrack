@@ -54,7 +54,27 @@ export default function DetailAlatPage({ params }: { params: Promise<{ id: strin
 
     try {
       const loanId = `loan-${Date.now()}`;
-      const letterUrl = uploadedFile ? `uploads/${uploadedFile.name}` : undefined;
+      let letterUrl: string | undefined;
+
+      // Upload surat peminjaman PDF to Supabase Storage if provided
+      if (uploadedFile) {
+        const fileExt = uploadedFile.name.split('.').pop();
+        const fileName = `${loanId}-surat.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('equipment-images') // Reuse existing bucket
+          .upload(`letters/${fileName}`, uploadedFile);
+
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+          toast.error('Gagal upload surat peminjaman');
+        } else {
+          const { data: { publicUrl } } = supabase.storage
+            .from('equipment-images')
+            .getPublicUrl(`letters/${fileName}`);
+          letterUrl = publicUrl;
+        }
+      }
       
       // User ID should already be UUID from login
       const userUuid = currentUser.id;

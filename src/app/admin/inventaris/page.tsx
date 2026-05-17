@@ -281,19 +281,13 @@ export default function ManajemenInventarisPage() {
                         </div>
                       </td>
                       <td className="py-4 px-6">
-                        <select 
-                          value={eq.status}
-                          onChange={() => toast('Ubah status melalui form edit', { icon: 'ℹ️' })}
-                          className={`text-xs font-bold px-3 py-1.5 rounded-full appearance-none outline-none border-2 cursor-pointer ${
-                            eq.status === 'tersedia' ? 'bg-success-light text-success-800 border-success/20' : 
-                            eq.status === 'maintenance' ? 'bg-warning-light text-warning-800 border-warning/20' : 
-                            'bg-info-light text-info-800 border-info/20'
-                          }`}
-                        >
-                          <option value="tersedia">Tersedia</option>
-                          <option value="dipinjam">Dipinjam</option>
-                          <option value="maintenance">Maintenance</option>
-                        </select>
+                        <span className={`inline-block text-xs font-bold px-3 py-1.5 rounded-full ${
+                          eq.status === 'tersedia' ? 'bg-success-light text-green-800' : 
+                          eq.status === 'maintenance' ? 'bg-warning-light text-amber-800' : 
+                          'bg-info-light text-blue-800'
+                        }`}>
+                          {eq.status === 'tersedia' ? 'Tersedia' : eq.status === 'maintenance' ? 'Maintenance' : 'Dipinjam'}
+                        </span>
                       </td>
                       <td className="py-4 px-6">
                         <div className="flex items-center justify-end gap-2">

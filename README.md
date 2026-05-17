@@ -203,19 +203,27 @@ Buka [http://localhost:3000](http://localhost:3000) di browser.
 
 ## 👥 Demo Accounts
 
+### Super Admin
+- **Email**: `superadmin@untirta.ac.id`
+- **Password**: `superadmin123`
+- **Akses**: Kelola semua user, admin, dan mahasiswa
+
 ### Mahasiswa
 - **Email**: `ahmad.fauzan@student.untirta.ac.id`
-- **Password**: `mahasiswa123`
+- **Password**: `password123`
 
 ### Admin/Asisten Lab
 - **Email**: `rizky.pratama@untirta.ac.id`
-- **Password**: `admin123`
+- **Password**: `password123`
+
+**⚠️ PENTING:** Untuk registrasi mahasiswa baru, gunakan halaman `/register` dengan NIM format `3333YYXXXX` (Teknik Industri).
 
 ## 📱 Struktur Halaman
 
 ### Public Routes
 - `/` - Landing page
 - `/login` - Halaman login
+- `/register` - Halaman registrasi mahasiswa (NIM 3333YYXXXX)
 
 ### Mahasiswa Routes
 - `/mahasiswa` - Dashboard mahasiswa
@@ -231,6 +239,11 @@ Buka [http://localhost:3000](http://localhost:3000) di browser.
 - `/admin/pengembalian` - Proses pengembalian alat
 - `/admin/monitoring` - Monitoring & laporan
 - `/admin/log` - Activity log sistem
+
+### Super Admin Routes
+- `/super-admin` - Dashboard super admin
+- Kelola user (mahasiswa, admin, super admin)
+- Monitoring semua aktivitas sistem
 
 ## 🔧 Konfigurasi
 

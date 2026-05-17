@@ -19,7 +19,7 @@ export default function ActivityLogPage() {
   });
 
   return (
-    <DashboardLayout role="admin">
+    <DashboardLayout>
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 animate-fade-in-up">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-800 font-[family-name:var(--font-heading)]">Activity Log</h1>

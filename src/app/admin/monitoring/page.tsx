@@ -148,7 +148,12 @@ export default function MonitoringPage() {
         {[
           { label: 'Total Peminjaman', value: loans.length, icon: Activity, bg: 'bg-blue-50', color: 'text-info' },
           { label: 'Peminjam Unik', value: new Set(loans.map(l => l.userId)).size, icon: User, bg: 'bg-purple-50', color: 'text-purple-600' },
-          { label: 'Alat Paling Sering', value: 'Stopwatch', icon: TrendingUp, bg: 'bg-orange-50', color: 'text-warning' },
+          { label: 'Alat Paling Sering', value: (() => {
+            if (loans.length === 0) return '-';
+            const counts: Record<string, number> = {};
+            loans.forEach(l => { counts[l.equipmentName] = (counts[l.equipmentName] || 0) + 1; });
+            return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || '-';
+          })(), icon: TrendingUp, bg: 'bg-orange-50', color: 'text-warning' },
         ].map((stat, i) => (
           <div key={i} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4 animate-fade-in-up" style={{ animationDelay: `${i * 0.1}s` }}>
             <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.bg}`}>

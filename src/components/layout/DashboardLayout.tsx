@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { useStore } from '@/lib/store';
 
-export default function DashboardLayout({ children, role }: { children: React.ReactNode, role: 'mahasiswa' | 'admin' }) {
+export default function DashboardLayout({ children, role }: { children: React.ReactNode, role?: 'mahasiswa' | 'admin' | 'super_admin' }) {
   const router = useRouter();
   const pathname = usePathname();
   const { currentUser, logout, getUnreadCount, notifications, markNotificationAsRead } = useStore();
@@ -17,8 +17,12 @@ export default function DashboardLayout({ children, role }: { children: React.Re
   const [scrolled, setScrolled] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
 
+  // Auto-detect role from currentUser if not provided
+  const effectiveRole = role || currentUser?.role;
+
   useEffect(() => {
-    if (!currentUser || currentUser.role !== role) {
+    // Allow super_admin to access all pages
+    if (!currentUser || (role && currentUser.role !== role && currentUser.role !== 'super_admin')) {
       router.push('/login');
     }
   }, [currentUser, role, router]);
@@ -41,11 +45,16 @@ export default function DashboardLayout({ children, role }: { children: React.Re
 
   if (!currentUser) return null; // Prevent hydration mismatch before redirect
 
-  const menuItems = role === 'mahasiswa' ? [
+  const menuItems = effectiveRole === 'mahasiswa' ? [
     { label: 'Dashboard', icon: LayoutDashboard, href: '/mahasiswa' },
     { label: 'Inventaris Alat', icon: PackageSearch, href: '/mahasiswa/inventaris' },
     { label: 'Status Peminjaman', icon: ClipboardList, href: '/mahasiswa/status' },
     { label: 'Riwayat', icon: History, href: '/mahasiswa/riwayat' },
+  ] : effectiveRole === 'super_admin' ? [
+    { label: 'Dashboard & User', icon: LayoutDashboard, href: '/super-admin' },
+    { label: 'Inventaris Alat', icon: PackageSearch, href: '/admin/inventaris' },
+    { label: 'Monitoring', icon: Activity, href: '/admin/monitoring' },
+    { label: 'Activity Log', icon: FileText, href: '/admin/log' },
   ] : [
     { label: 'Dashboard', icon: LayoutDashboard, href: '/admin' },
     { label: 'Manajemen Inventaris', icon: PackageSearch, href: '/admin/inventaris' },
@@ -76,7 +85,7 @@ export default function DashboardLayout({ children, role }: { children: React.Re
       {/* Sidebar - Desktop */}
       <aside className="hidden lg:flex w-64 flex-col bg-navy-900 text-white fixed inset-y-0 z-40 border-r border-white/10">
         <div className="h-20 flex items-center px-6 border-b border-white/10">
-          <Link href={`/${role}`} className="flex items-center gap-2.5 group">
+          <Link href={effectiveRole === 'super_admin' ? '/super-admin' : `/${effectiveRole}`} className="flex items-center gap-2.5 group">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-cyan to-navy-600 flex items-center justify-center">
               <FlaskConical className="w-4 h-4 text-white" />
             </div>
@@ -87,7 +96,7 @@ export default function DashboardLayout({ children, role }: { children: React.Re
         <div className="flex-1 overflow-y-auto py-6 px-4 space-y-1 custom-scrollbar">
           <div className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-4 px-2">Menu Utama</div>
           {menuItems.map(item => {
-            const active = pathname === item.href || (item.href !== `/${role}` && pathname.startsWith(item.href));
+            const active = pathname === item.href || (item.href !== `/${effectiveRole}` && item.href !== '/super-admin' && pathname.startsWith(item.href));
             return (
               <Link key={item.href} href={item.href} className={`flex items-center gap-3 px-3 py-3 rounded-xl font-medium transition-all ${active ? 'bg-accent-cyan/10 text-accent-cyan' : 'text-white/60 hover:bg-white/5 hover:text-white'}`}>
                 <item.icon className="w-5 h-5" />
@@ -113,7 +122,7 @@ export default function DashboardLayout({ children, role }: { children: React.Re
       {/* Sidebar - Mobile */}
       <aside className={`fixed inset-y-0 left-0 w-64 bg-navy-900 text-white z-50 transform transition-transform duration-300 lg:hidden flex flex-col border-r border-white/10 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="h-16 flex items-center justify-between px-4 border-b border-white/10">
-          <Link href={`/${role}`} className="flex items-center gap-2">
+          <Link href={effectiveRole === 'super_admin' ? '/super-admin' : `/${effectiveRole}`} className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-accent-cyan flex items-center justify-center">
               <FlaskConical className="w-4 h-4 text-white" />
             </div>
@@ -126,7 +135,7 @@ export default function DashboardLayout({ children, role }: { children: React.Re
 
         <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
           {menuItems.map(item => {
-            const active = pathname === item.href || (item.href !== `/${role}` && pathname.startsWith(item.href));
+            const active = pathname === item.href || (item.href !== `/${effectiveRole}` && item.href !== '/super-admin' && pathname.startsWith(item.href));
             return (
               <Link key={item.href} href={item.href} onClick={() => setSidebarOpen(false)} className={`flex items-center gap-3 px-3 py-3 rounded-xl font-medium transition-all ${active ? 'bg-accent-cyan/10 text-accent-cyan' : 'text-white/60 hover:bg-white/5 hover:text-white'}`}>
                 <item.icon className="w-5 h-5" />
@@ -152,10 +161,7 @@ export default function DashboardLayout({ children, role }: { children: React.Re
             <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 rounded-xl text-navy-700 bg-white shadow-sm border border-gray-100 hover:bg-gray-50">
               <Menu className="w-5 h-5" />
             </button>
-            <div className="hidden sm:flex items-center relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input type="text" placeholder="Cari..." className="pl-9 pr-4 py-2 w-64 rounded-full bg-white border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-accent-cyan/30 focus:border-accent-cyan transition-all" />
-            </div>
+            {/* Search bar removed — individual pages have their own search */}
           </div>
 
           <div className="flex items-center gap-3 sm:gap-5">

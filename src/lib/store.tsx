@@ -1,8 +1,9 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, Equipment, Loan, Laboratory, ActivityLog, Notification } from './types';
-import { equipment as initialEquipment, laboratories as initialLaboratories, users as initialUsers } from './data';
+import { User, Equipment, Loan, Laboratory, ActivityLog, Notification, RegisterData } from './types';
+// Data is now fetched from Supabase, no static imports needed
 import { supabase } from './supabase';
+import { hashPassword, verifyPassword, validateEmailDomain, validateMahasiswaEmail, validateNIMTeknikIndustri } from './auth';
 import toast from 'react-hot-toast';
 
 interface StoreContextType {
@@ -12,9 +13,17 @@ interface StoreContextType {
   loans: Loan[];
   activityLogs: ActivityLog[];
   isLoading: boolean;
+  users: User[];
 
-  login: (email: string) => Promise<User | null>;
+  login: (email: string, password: string) => Promise<User | null>;
+  register: (data: RegisterData) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
+  
+  // Super Admin functions
+  getAllUsers: () => Promise<User[]>;
+  createUser: (user: Omit<User, 'id' | 'createdAt'>) => Promise<{ success: boolean; error?: string }>;
+  updateUser: (id: string, data: Partial<User>) => Promise<{ success: boolean; error?: string }>;
+  deleteUser: (id: string) => Promise<{ success: boolean; error?: string }>;
 
   getEquipment: (id: string) => Equipment | undefined;
   getLab: (id: string) => Laboratory | undefined;
@@ -42,6 +51,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [loans, setLoans] = useState<Loan[]>([]);
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Initialize data from Supabase
@@ -88,7 +98,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             ...e,
             labId: e.lab_id,
             totalStock: e.total_stock,
-            availableStock: e.available_stock
+            availableStock: e.available_stock,
+            createdAt: e.created_at || new Date().toISOString(),
+            updatedAt: e.updated_at || e.created_at || new Date().toISOString()
           }));
           setEquipment(mappedEq as Equipment[]);
         }
@@ -165,19 +177,66 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
     fetchData();
 
-    // Set up realtime subscriptions
+    // Set up realtime subscriptions — handle changes granularly instead of re-fetching everything
     const loansSub = supabase.channel('loans_changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'loans' }, (payload) => {
-        console.log('Loans change detected:', payload);
-        // Re-fetch all data on change
-        fetchData();
-      }).subscribe();
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'loans' }, (payload) => {
+        console.log('Loan inserted:', payload.new);
+        const l = payload.new as any;
+        const newLoan: Loan = {
+          ...l,
+          userId: l.user_id, userName: l.user_name, userNim: l.user_nim, userKelas: l.user_kelas,
+          equipmentId: l.equipment_id, equipmentName: l.equipment_name,
+          labId: l.lab_id, labName: l.lab_name,
+          borrowDate: l.borrow_date, returnDate: l.return_date,
+          actualReturnDate: l.actual_return_date, returnCondition: l.return_condition,
+          returnNotes: l.return_notes, createdAt: l.created_at
+        };
+        setLoans(prev => [newLoan, ...prev.filter(existing => existing.id !== newLoan.id)]);
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'loans' }, (payload) => {
+        console.log('Loan updated:', payload.new);
+        const l = payload.new as any;
+        setLoans(prev => prev.map(loan => loan.id === l.id ? {
+          ...loan, ...l,
+          userId: l.user_id, userName: l.user_name, userNim: l.user_nim, userKelas: l.user_kelas,
+          equipmentId: l.equipment_id, equipmentName: l.equipment_name,
+          labId: l.lab_id, labName: l.lab_name,
+          borrowDate: l.borrow_date, returnDate: l.return_date,
+          actualReturnDate: l.actual_return_date, returnCondition: l.return_condition,
+          returnNotes: l.return_notes, createdAt: l.created_at,
+          status: l.status
+        } : loan));
+      })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'loans' }, (payload) => {
+        console.log('Loan deleted:', payload.old);
+        setLoans(prev => prev.filter(l => l.id !== (payload.old as any).id));
+      })
+      .subscribe();
 
     const eqSub = supabase.channel('equipment_changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'equipment' }, (payload) => {
-        console.log('Equipment change detected:', payload);
-        fetchData();
-      }).subscribe();
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'equipment' }, (payload) => {
+        console.log('Equipment inserted:', payload.new);
+        const e = payload.new as any;
+        const newEq: Equipment = {
+          ...e, labId: e.lab_id, totalStock: e.total_stock, availableStock: e.available_stock,
+          createdAt: e.created_at || new Date().toISOString(),
+          updatedAt: e.updated_at || e.created_at || new Date().toISOString()
+        };
+        setEquipment(prev => [...prev.filter(existing => existing.id !== newEq.id), newEq]);
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'equipment' }, (payload) => {
+        console.log('Equipment updated:', payload.new);
+        const e = payload.new as any;
+        setEquipment(prev => prev.map(eq => eq.id === e.id ? {
+          ...eq, ...e, labId: e.lab_id, totalStock: e.total_stock, availableStock: e.available_stock,
+          updatedAt: e.updated_at || new Date().toISOString()
+        } : eq));
+      })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'equipment' }, (payload) => {
+        console.log('Equipment deleted:', payload.old);
+        setEquipment(prev => prev.filter(e => e.id !== (payload.old as any).id));
+      })
+      .subscribe();
 
     return () => {
       supabase.removeChannel(loansSub);
@@ -185,12 +244,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // Check for overdue loans every minute
+  // Check for overdue loans every minute — use ref to prevent infinite loops
+  const overdueCheckedRef = React.useRef<Set<string>>(new Set());
   useEffect(() => {
     const checkOverdueLoans = () => {
       const now = new Date();
       loans.forEach(loan => {
-        if (loan.status === 'dipinjam' && new Date(loan.returnDate) < now) {
+        // Only process loans that are 'dipinjam' and haven't been checked yet
+        if (loan.status === 'dipinjam' && new Date(loan.returnDate) < now && !overdueCheckedRef.current.has(loan.id)) {
+          overdueCheckedRef.current.add(loan.id);
+          
           // Update loan status to overdue
           updateLoanStatus(loan.id, 'terlambat');
 
@@ -207,50 +270,382 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     };
 
     const interval = setInterval(checkOverdueLoans, 60000); // Check every minute
+    checkOverdueLoans(); // Check immediately on mount
     return () => clearInterval(interval);
   }, [loans]);
 
-  const login = async (email: string): Promise<User | null> => {
+  const login = async (email: string, password: string): Promise<User | null> => {
     try {
-      // Always try Supabase first to get UUID
-      const { data, error } = await supabase.from('users').select('*').eq('email', email).single();
+      console.log('🔐 Login attempt:', { email });
+      
+      // Try Supabase first
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .single();
+      
+      console.log('📊 Supabase response:', { data, error });
       
       if (data) {
-        console.log('✅ User logged in from Supabase:', data.id);
+        console.log('👤 User found:', { 
+          id: data.id, 
+          email: data.email, 
+          role: data.role,
+          hasPasswordHash: !!data.password_hash 
+        });
+        
+        // Verify password
+        const passwordHash = await hashPassword(password);
+        console.log('🔑 Password comparison:', { 
+          inputPrefix: passwordHash.substring(0, 20) + '...',
+          storedPrefix: data.password_hash ? data.password_hash.substring(0, 20) + '...' : 'null'
+        });
+        
+        // Block login if no password is set
+        if (!data.password_hash) {
+          console.log('❌ User has no password set — login blocked');
+          return null;
+        }
+        
+        if (data.password_hash !== passwordHash) {
+          console.log('❌ Password mismatch');
+          return null;
+        }
+        
+        console.log('✅ Password verified');
+        
         // Map Supabase data to our User type
         const user: User = {
           id: data.id,
           name: data.name,
           email: data.email,
-          password: '', // Password not stored in Supabase public table
           role: data.role,
           nim: data.nim || undefined,
           kelas: data.kelas || undefined,
+          emailVerified: data.email_verified || false,
+          lastLogin: new Date().toISOString(),
           createdAt: data.created_at || new Date().toISOString(),
         };
+        
+        console.log('✅ User logged in:', { id: user.id, role: user.role });
+        
+        // Update last login
+        await supabase
+          .from('users')
+          .update({ last_login: user.lastLogin })
+          .eq('id', user.id);
+        
         setCurrentUser(user);
         localStorage.setItem('labtrack_user', JSON.stringify(user));
+        
+        // Add activity log
+        await addActivityLog({
+          userId: user.id,
+          userName: user.name,
+          userRole: user.role,
+          type: 'login',
+          description: `${user.name} login ke sistem`
+        });
+        
         return user;
       }
       
-      if (error) {
-        console.log('⚠️ User not found in Supabase, checking local data');
-      }
-
-      // Fallback to local users (but these should have UUID format now)
-      const localUser = initialUsers.find((u: User) => u.email === email);
-      if (localUser) {
-        console.log('✅ User logged in from local data:', localUser.id);
-        setCurrentUser(localUser);
-        localStorage.setItem('labtrack_user', JSON.stringify(localUser));
-        return localUser;
-      }
-
       console.log('❌ User not found');
       return null;
     } catch (error) {
       console.error('❌ Login error:', error);
       return null;
+    }
+  };
+
+  const register = async (data: RegisterData): Promise<{ success: boolean; error?: string }> => {
+    try {
+      // Validate email format (must be NIM@untirta.ac.id)
+      const emailValidation = validateMahasiswaEmail(data.email, data.nim);
+      if (!emailValidation.valid) {
+        return {
+          success: false,
+          error: emailValidation.error || 'Email tidak valid'
+        };
+      }
+
+      // Validate NIM
+      const nimValidation = validateNIMTeknikIndustri(data.nim);
+      if (!nimValidation.valid) {
+        return {
+          success: false,
+          error: nimValidation.error || 'NIM tidak valid'
+        };
+      }
+
+      // Check if email already exists
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select('email')
+        .eq('email', data.email)
+        .single();
+
+      if (existingUser) {
+        return {
+          success: false,
+          error: 'Email sudah terdaftar'
+        };
+      }
+
+      // Check if NIM already exists
+      const { data: existingNIM } = await supabase
+        .from('users')
+        .select('nim')
+        .eq('nim', data.nim)
+        .single();
+
+      if (existingNIM) {
+        return {
+          success: false,
+          error: 'NIM sudah terdaftar'
+        };
+      }
+
+      // Hash password
+      const passwordHash = await hashPassword(data.password);
+
+      // Create user
+      const { data: newUser, error } = await supabase
+        .from('users')
+        .insert([{
+          email: data.email,
+          name: data.name,
+          nim: data.nim,
+          kelas: data.kelas || null,
+          role: 'mahasiswa',
+          password_hash: passwordHash,
+          email_verified: true // Auto verify for demo
+        }])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Registration error:', error);
+        return {
+          success: false,
+          error: 'Gagal mendaftar. Silakan coba lagi.'
+        };
+      }
+
+      console.log('✅ User registered:', newUser.id);
+
+      // Add activity log
+      await addActivityLog({
+        userId: newUser.id,
+        userName: newUser.name,
+        userRole: 'mahasiswa',
+        type: 'register',
+        description: `${newUser.name} mendaftar sebagai mahasiswa`
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error('Registration error:', error);
+      return {
+        success: false,
+        error: 'Terjadi kesalahan. Silakan coba lagi.'
+      };
+    }
+  };
+
+  const getAllUsers = async (): Promise<User[]> => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const mappedUsers = data.map(u => ({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        role: u.role,
+        nim: u.nim || undefined,
+        kelas: u.kelas || undefined,
+        emailVerified: u.email_verified || false,
+        lastLogin: u.last_login || undefined,
+        createdAt: u.created_at || undefined
+      }));
+
+      setUsers(mappedUsers);
+      return mappedUsers;
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      return [];
+    }
+  };
+
+  const createUser = async (user: Omit<User, 'id' | 'createdAt'>): Promise<{ success: boolean; error?: string }> => {
+    try {
+      // Validate email domain
+      if (!validateEmailDomain(user.email, user.role === 'mahasiswa' ? 'mahasiswa' : 'admin')) {
+        return {
+          success: false,
+          error: user.role === 'mahasiswa' 
+            ? 'Email mahasiswa harus format NIM@untirta.ac.id'
+            : 'Email admin harus @untirta.ac.id'
+        };
+      }
+
+      // Validate NIM for mahasiswa
+      if (user.role === 'mahasiswa' && user.nim) {
+        const nimValidation = validateNIMTeknikIndustri(user.nim);
+        if (!nimValidation.valid) {
+          return {
+            success: false,
+            error: nimValidation.error || 'NIM tidak valid'
+          };
+        }
+      }
+
+      // Hash password if provided
+      let passwordHash = undefined;
+      if (user.password) {
+        passwordHash = await hashPassword(user.password);
+      }
+
+      const { data, error } = await supabase
+        .from('users')
+        .insert([{
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          nim: user.nim || null,
+          kelas: user.kelas || null,
+          password_hash: passwordHash,
+          email_verified: true,
+          created_at: new Date().toISOString()
+        }])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Create user error:', error);
+        return {
+          success: false,
+          error: 'Gagal membuat user. Email atau NIM mungkin sudah terdaftar.'
+        };
+      }
+
+      // Add activity log
+      if (currentUser) {
+        await addActivityLog({
+          userId: currentUser.id,
+          userName: currentUser.name,
+          userRole: currentUser.role,
+          type: 'tambah_user',
+          description: `${currentUser.name} menambahkan user ${data.name}`
+        });
+      }
+
+      // Refresh users list
+      await getAllUsers();
+
+      return { success: true };
+    } catch (error) {
+      console.error('Create user error:', error);
+      return {
+        success: false,
+        error: 'Terjadi kesalahan. Silakan coba lagi.'
+      };
+    }
+  };
+
+  const updateUser = async (id: string, data: Partial<User>): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const updateData: any = {};
+      
+      if (data.name) updateData.name = data.name;
+      if (data.email) updateData.email = data.email;
+      if (data.role) updateData.role = data.role;
+      if (data.nim !== undefined) updateData.nim = data.nim;
+      if (data.kelas !== undefined) updateData.kelas = data.kelas;
+      
+      if (data.password) {
+        updateData.password_hash = await hashPassword(data.password);
+      }
+
+      const { error } = await supabase
+        .from('users')
+        .update(updateData)
+        .eq('id', id);
+
+      if (error) {
+        console.error('Update user error:', error);
+        return {
+          success: false,
+          error: 'Gagal mengupdate user.'
+        };
+      }
+
+      // Add activity log
+      if (currentUser) {
+        await addActivityLog({
+          userId: currentUser.id,
+          userName: currentUser.name,
+          userRole: currentUser.role,
+          type: 'edit_user',
+          description: `${currentUser.name} mengupdate data user`
+        });
+      }
+
+      // Refresh users list
+      await getAllUsers();
+
+      return { success: true };
+    } catch (error) {
+      console.error('Update user error:', error);
+      return {
+        success: false,
+        error: 'Terjadi kesalahan. Silakan coba lagi.'
+      };
+    }
+  };
+
+  const deleteUser = async (id: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const { error } = await supabase
+        .from('users')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Delete user error:', error);
+        return {
+          success: false,
+          error: 'Gagal menghapus user.'
+        };
+      }
+
+      // Add activity log
+      if (currentUser) {
+        await addActivityLog({
+          userId: currentUser.id,
+          userName: currentUser.name,
+          userRole: currentUser.role,
+          type: 'hapus_user',
+          description: `${currentUser.name} menghapus user`
+        });
+      }
+
+      // Refresh users list
+      await getAllUsers();
+
+      return { success: true };
+    } catch (error) {
+      console.error('Delete user error:', error);
+      return {
+        success: false,
+        error: 'Terjadi kesalahan. Silakan coba lagi.'
+      };
     }
   };
 
@@ -431,8 +826,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   return (
     <StoreContext.Provider value={{
-      currentUser, laboratories, equipment, loans, activityLogs, notifications, isLoading,
-      login, logout, getEquipment, getLab, getLoansByUser, getPendingLoans, getActiveLoans, getUnreadCount,
+      currentUser, laboratories, equipment, loans, activityLogs, notifications, isLoading, users,
+      login, register, logout, 
+      getAllUsers, createUser, updateUser, deleteUser,
+      getEquipment, getLab, getLoansByUser, getPendingLoans, getActiveLoans, getUnreadCount,
       createLoan, updateLoanStatus, deleteEquipment, updateEquipment, addActivityLog,
       addNotification, markNotificationAsRead
     }}>

@@ -1,19 +1,30 @@
-export type UserRole = 'mahasiswa' | 'admin';
+export type UserRole = 'mahasiswa' | 'admin' | 'asisten' | 'super_admin';
 export type EquipmentStatus = 'tersedia' | 'dipinjam' | 'maintenance';
 export type LoanStatus = 'menunggu' | 'disetujui' | 'ditolak' | 'dipinjam' | 'dikembalikan' | 'terlambat';
 export type LabName = 'LSIPro' | 'RSK&E' | 'OSI&K' | 'SMI';
-export type ActivityType = 'login' | 'peminjaman' | 'pengembalian' | 'approve' | 'reject' | 'tambah_alat' | 'edit_alat' | 'hapus_alat' | 'update_status';
+export type ActivityType = 'login' | 'peminjaman' | 'pengembalian' | 'approve' | 'reject' | 'tambah_alat' | 'edit_alat' | 'hapus_alat' | 'update_status' | 'register' | 'tambah_user' | 'hapus_user' | 'edit_user';
 
 export interface User {
   id: string;
   name: string;
   email: string;
   password?: string;
+  passwordHash?: string;
   role: UserRole;
   nim?: string;
   kelas?: string;
   avatar?: string;
+  emailVerified?: boolean;
+  lastLogin?: string;
   createdAt?: string;
+}
+
+export interface RegisterData {
+  name: string;
+  email: string;
+  password: string;
+  nim: string;
+  kelas?: string;
 }
 
 export interface Laboratory {
@@ -38,7 +49,7 @@ export interface Equipment {
   category: string;
   specifications?: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 export interface Loan {
