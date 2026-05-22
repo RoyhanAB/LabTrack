@@ -450,6 +450,24 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         };
       }
 
+      const verificationResponse = await fetch('/api/register/verify-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: data.email,
+          nim: data.nim,
+          code: data.verificationCode
+        })
+      });
+
+      const verificationResult = await verificationResponse.json().catch(() => null);
+      if (!verificationResponse.ok || !verificationResult?.success) {
+        return {
+          success: false,
+          error: verificationResult?.error || 'Kode verifikasi tidak valid'
+        };
+      }
+
       // Hash password
       const passwordHash = await hashPassword(data.password);
 

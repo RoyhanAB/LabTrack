@@ -35,6 +35,17 @@ CREATE TABLE public.users (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
+CREATE TABLE public.pending_registrations (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  email TEXT NOT NULL,
+  nim TEXT NOT NULL,
+  code_hash TEXT NOT NULL,
+  attempts INTEGER NOT NULL DEFAULT 0,
+  expires_at TIMESTAMPTZ NOT NULL,
+  consumed BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
 CREATE TABLE public.laboratories (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
@@ -100,6 +111,7 @@ CREATE TABLE public.activity_logs (
 -- ==========================================
 
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.pending_registrations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.laboratories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.equipment ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.loans ENABLE ROW LEVEL SECURITY;
@@ -110,6 +122,12 @@ CREATE POLICY "users_select" ON public.users FOR SELECT USING (true);
 CREATE POLICY "users_insert" ON public.users FOR INSERT WITH CHECK (true);
 CREATE POLICY "users_update" ON public.users FOR UPDATE USING (true);
 CREATE POLICY "users_delete" ON public.users FOR DELETE USING (true);
+
+-- Pending Registrations
+CREATE POLICY "pending_registrations_select" ON public.pending_registrations FOR SELECT USING (true);
+CREATE POLICY "pending_registrations_insert" ON public.pending_registrations FOR INSERT WITH CHECK (true);
+CREATE POLICY "pending_registrations_update" ON public.pending_registrations FOR UPDATE USING (true);
+CREATE POLICY "pending_registrations_delete" ON public.pending_registrations FOR DELETE USING (true);
 
 -- Laboratories
 CREATE POLICY "labs_select" ON public.laboratories FOR SELECT USING (true);
@@ -137,6 +155,8 @@ CREATE POLICY "logs_delete" ON public.activity_logs FOR DELETE USING (true);
 
 CREATE INDEX idx_users_email ON public.users(email);
 CREATE INDEX idx_users_role ON public.users(role);
+CREATE INDEX idx_pending_registrations_email_nim ON public.pending_registrations(email, nim);
+CREATE INDEX idx_pending_registrations_expires_at ON public.pending_registrations(expires_at);
 CREATE INDEX idx_loans_user_id ON public.loans(user_id);
 CREATE INDEX idx_loans_status ON public.loans(status);
 CREATE INDEX idx_equipment_lab_id ON public.equipment(lab_id);
