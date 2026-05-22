@@ -7,8 +7,16 @@ import toast from 'react-hot-toast';
 import { Equipment } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 
+const getErrorMessage = (error: unknown) =>
+  error instanceof Error ? error.message : 'Terjadi kesalahan';
+
+const parseStockInput = (value: string) => {
+  const parsed = Number.parseInt(value, 10);
+  return Number.isNaN(parsed) ? 0 : parsed;
+};
+
 export default function ManajemenInventarisPage() {
-  const { equipment, laboratories, deleteEquipment, currentUser, addActivityLog, isLoading, updateEquipment } = useStore();
+  const { equipment, laboratories, createEquipment, deleteEquipment, currentUser, addActivityLog, isLoading, updateEquipment } = useStore();
   const [search, setSearch] = useState('');
   const [selectedLab, setSelectedLab] = useState('all');
   const [showModal, setShowModal] = useState(false);
@@ -76,6 +84,11 @@ export default function ManajemenInventarisPage() {
     setIsUploading(true);
     
     try {
+      if (formData.availableStock > formData.totalStock) {
+        toast.error('Stok tersedia tidak boleh lebih besar dari total stok');
+        return;
+      }
+
       let imageUrl = formData.image;
 
       if (imageFile) {
@@ -97,23 +110,6 @@ export default function ManajemenInventarisPage() {
       }
 
       if (editingEquipment) {
-        // Update existing equipment
-        const dbUpdate: any = {
-          name: formData.name,
-          description: formData.description,
-          lab_id: formData.labId,
-          total_stock: formData.totalStock,
-          available_stock: formData.availableStock,
-          condition: formData.condition,
-          status: formData.status,
-          category: formData.category,
-          specifications: formData.specifications,
-          image: imageUrl
-        };
-
-        const { error } = await supabase.from('equipment').update(dbUpdate).eq('id', editingEquipment.id);
-        if (error) throw error;
-
         await updateEquipment(editingEquipment.id, {
           ...formData,
           image: imageUrl,
@@ -123,7 +119,7 @@ export default function ManajemenInventarisPage() {
         addActivityLog({
           userId: currentUser!.id,
           userName: currentUser!.name,
-          userRole: 'admin',
+          userRole: currentUser!.role,
           type: 'edit_alat',
           description: `Mengubah data alat ${formData.name}`
         });
@@ -132,28 +128,29 @@ export default function ManajemenInventarisPage() {
       } else {
         // Add new equipment
         const newId = `eq-${Date.now()}`;
-        const newEquipment = {
+        const createdAt = new Date().toISOString();
+        const newEquipment: Equipment = {
           id: newId,
           name: formData.name,
           description: formData.description,
-          lab_id: formData.labId,
-          total_stock: formData.totalStock,
-          available_stock: formData.availableStock,
+          labId: formData.labId,
+          totalStock: formData.totalStock,
+          availableStock: formData.availableStock,
           condition: formData.condition,
           status: formData.status,
           category: formData.category,
           specifications: formData.specifications,
           image: imageUrl,
-          created_at: new Date().toISOString()
+          createdAt,
+          updatedAt: createdAt
         };
 
-        const { error } = await supabase.from('equipment').insert([newEquipment]);
-        if (error) throw error;
+        await createEquipment(newEquipment);
 
         addActivityLog({
           userId: currentUser!.id,
           userName: currentUser!.name,
-          userRole: 'admin',
+          userRole: currentUser!.role,
           type: 'tambah_alat',
           description: `Menambahkan alat baru: ${formData.name}`
         });
@@ -163,9 +160,9 @@ export default function ManajemenInventarisPage() {
 
       setShowModal(false);
       // Data will auto-refresh via realtime subscription
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error saving equipment:', error);
-      toast.error(`Gagal menyimpan: ${error.message || 'Terjadi kesalahan'}`);
+      toast.error(`Gagal menyimpan: ${getErrorMessage(error)}`);
     } finally {
       setIsUploading(false);
     }
@@ -178,12 +175,12 @@ export default function ManajemenInventarisPage() {
         addActivityLog({
           userId: currentUser!.id,
           userName: currentUser!.name,
-          userRole: 'admin',
+          userRole: currentUser!.role,
           type: 'hapus_alat',
           description: `Menghapus alat ${name} dari inventaris`
         });
         toast.success('Alat berhasil dihapus');
-      } catch (error) {
+      } catch {
         toast.error('Gagal menghapus alat');
       }
     }
@@ -373,7 +370,14 @@ export default function ManajemenInventarisPage() {
                     type="number" 
                     min="0"
                     value={formData.totalStock}
-                    onChange={e => setFormData({...formData, totalStock: parseInt(e.target.value)})}
+                    onChange={e => {
+                      const totalStock = parseStockInput(e.target.value);
+                      setFormData({
+                        ...formData,
+                        totalStock,
+                        availableStock: Math.min(formData.availableStock, totalStock)
+                      });
+                    }}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent-cyan/30 focus:border-accent-cyan outline-none"
                     required
                   />
@@ -386,7 +390,7 @@ export default function ManajemenInventarisPage() {
                     min="0"
                     max={formData.totalStock}
                     value={formData.availableStock}
-                    onChange={e => setFormData({...formData, availableStock: parseInt(e.target.value)})}
+                    onChange={e => setFormData({...formData, availableStock: Math.min(parseStockInput(e.target.value), formData.totalStock)})}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent-cyan/30 focus:border-accent-cyan outline-none"
                     required
                   />
@@ -408,7 +412,7 @@ export default function ManajemenInventarisPage() {
                   <label className="block text-sm font-medium text-navy-700 mb-1.5">Status *</label>
                   <select 
                     value={formData.status}
-                    onChange={e => setFormData({...formData, status: e.target.value as any})}
+                    onChange={e => setFormData({...formData, status: e.target.value as Equipment['status']})}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent-cyan/30 focus:border-accent-cyan outline-none appearance-none"
                     required
                   >
@@ -457,6 +461,7 @@ export default function ManajemenInventarisPage() {
                   {formData.image && !imageFile && (
                     <div className="mt-3 text-sm text-gray-500 flex items-center gap-2">
                       <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
                       </div>
                       <span>Gambar saat ini tersimpan</span>

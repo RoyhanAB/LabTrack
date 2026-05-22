@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useStore } from '@/lib/store';
+import { supabase } from '@/lib/supabase';
 import { Check, X, ClipboardList, Calendar, FileText, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
@@ -9,6 +10,7 @@ import { id } from 'date-fns/locale';
 
 export default function VerifikasiPage() {
   const { getPendingLoans, updateLoanStatus, currentUser, addActivityLog, getEquipment, updateEquipment, addNotification, loans, isLoading } = useStore();
+  const [processingLoanId, setProcessingLoanId] = useState<string | null>(null);
   
   if (isLoading) {
     return (
@@ -21,8 +23,13 @@ export default function VerifikasiPage() {
   }
 
   const pendingLoans = getPendingLoans().sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+
+  const isMissingRpcFunction = (error: { code?: string; message?: string }) =>
+    error.code === 'PGRST202' || /function .*not found|could not find.*function/i.test(error.message || '');
   
   const handleApprove = async (loanId: string, equipmentId: string, quantity: number, eqName: string, userName: string) => {
+    if (processingLoanId) return;
+    setProcessingLoanId(loanId);
     try {
       const eq = getEquipment(equipmentId);
       if (!eq) {
@@ -40,18 +47,34 @@ export default function VerifikasiPage() {
         toast.error('Peminjaman tidak ditemukan');
         return;
       }
+      if (loan.status !== 'menunggu') {
+        toast.error('Peminjaman ini sudah diproses');
+        return;
+      }
 
-      // Update equipment stock
-      await updateEquipment(equipmentId, { 
-        availableStock: eq.availableStock - quantity,
-        status: eq.availableStock - quantity === 0 ? 'dipinjam' : 'tersedia'
+      const approvedAt = new Date().toISOString();
+      const { error: rpcError } = await supabase.rpc('approve_loan_transaction', {
+        p_loan_id: loanId,
+        p_equipment_id: equipmentId,
+        p_quantity: quantity,
+        p_approved_by: currentUser!.name,
+        p_approved_at: approvedAt
       });
-      
-      // Update loan status to "dipinjam" (not "disetujui")
-      await updateLoanStatus(loanId, 'dipinjam', { 
-        approvedBy: currentUser!.name, 
-        approvedAt: new Date().toISOString() 
-      });
+
+      if (rpcError) {
+        if (!isMissingRpcFunction(rpcError)) {
+          throw rpcError;
+        }
+
+        await updateEquipment(equipmentId, {
+          availableStock: eq.availableStock - quantity,
+          status: eq.availableStock - quantity === 0 ? 'dipinjam' : 'tersedia'
+        });
+        await updateLoanStatus(loanId, 'dipinjam', {
+          approvedBy: currentUser!.name,
+          approvedAt
+        });
+      }
       
       // Add notification for student
       addNotification({
@@ -65,7 +88,7 @@ export default function VerifikasiPage() {
       addActivityLog({
         userId: currentUser!.id,
         userName: currentUser!.name,
-        userRole: 'admin',
+        userRole: currentUser!.role,
         type: 'approve',
         description: `Menyetujui peminjaman ${eqName} (${quantity} unit) oleh ${userName}`
       });
@@ -74,14 +97,22 @@ export default function VerifikasiPage() {
     } catch (error) {
       console.error('Error approving loan:', error);
       toast.error('Gagal menyetujui peminjaman');
+    } finally {
+      setProcessingLoanId(null);
     }
   };
 
   const handleReject = async (loanId: string, eqName: string, userName: string) => {
+    if (processingLoanId) return;
+    setProcessingLoanId(loanId);
     try {
       const loan = loans.find(l => l.id === loanId);
       if (!loan) {
         toast.error('Peminjaman tidak ditemukan');
+        return;
+      }
+      if (loan.status !== 'menunggu') {
+        toast.error('Peminjaman ini sudah diproses');
         return;
       }
 
@@ -102,7 +133,7 @@ export default function VerifikasiPage() {
       addActivityLog({
         userId: currentUser!.id,
         userName: currentUser!.name,
-        userRole: 'admin',
+        userRole: currentUser!.role,
         type: 'reject',
         description: `Menolak peminjaman ${eqName} oleh ${userName}`
       });
@@ -111,6 +142,8 @@ export default function VerifikasiPage() {
     } catch (error) {
       console.error('Error rejecting loan:', error);
       toast.error('Gagal menolak peminjaman');
+    } finally {
+      setProcessingLoanId(null);
     }
   };
 
@@ -193,15 +226,17 @@ export default function VerifikasiPage() {
               <div className="bg-gray-50 p-4 border-t border-gray-100 flex gap-3">
                 <button 
                   onClick={() => handleReject(loan.id, loan.equipmentName, loan.userName)}
-                  className="flex-1 py-3 flex items-center justify-center gap-2 rounded-xl text-danger bg-white border border-red-200 font-bold hover:bg-danger-light transition-colors"
+                  disabled={Boolean(processingLoanId)}
+                  className="flex-1 py-3 flex items-center justify-center gap-2 rounded-xl text-danger bg-white border border-red-200 font-bold hover:bg-danger-light transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  <X className="w-5 h-5" /> Tolak
+                  {processingLoanId === loan.id ? <span className="w-5 h-5 border-2 border-danger/30 border-t-danger rounded-full animate-spin" /> : <X className="w-5 h-5" />} Tolak
                 </button>
                 <button 
                   onClick={() => handleApprove(loan.id, loan.equipmentId, loan.quantity, loan.equipmentName, loan.userName)}
-                  className="flex-1 py-3 flex items-center justify-center gap-2 rounded-xl text-white bg-success font-bold hover:bg-success/90 shadow-md shadow-success/20 transition-all hover:-translate-y-0.5"
+                  disabled={Boolean(processingLoanId)}
+                  className="flex-1 py-3 flex items-center justify-center gap-2 rounded-xl text-white bg-success font-bold hover:bg-success/90 shadow-md shadow-success/20 transition-all hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  <Check className="w-5 h-5" /> Setujui
+                  {processingLoanId === loan.id ? <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Check className="w-5 h-5" />} Setujui
                 </button>
               </div>
             </div>

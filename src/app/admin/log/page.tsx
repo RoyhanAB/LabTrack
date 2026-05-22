@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useStore } from '@/lib/store';
-import { FileText, Search, Clock, Filter, User } from 'lucide-react';
+import { FileText, Search, Clock, Filter } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 

@@ -3,8 +3,134 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { User, Equipment, Loan, Laboratory, ActivityLog, Notification, RegisterData } from './types';
 // Data is now fetched from Supabase, no static imports needed
 import { supabase } from './supabase';
-import { hashPassword, verifyPassword, validateEmailDomain, validateMahasiswaEmail, validateNIMTeknikIndustri } from './auth';
+import { hashPassword, validateEmailDomain, validateMahasiswaEmail, validateNIMTeknikIndustri } from './auth';
 import toast from 'react-hot-toast';
+
+type DbLoan = {
+  id: string;
+  user_id: string;
+  user_name: string;
+  user_nim?: string | null;
+  user_kelas?: string | null;
+  equipment_id: string;
+  equipment_name: string;
+  lab_id: string;
+  lab_name: string;
+  quantity: number;
+  borrow_date: string;
+  return_date: string;
+  actual_return_date?: string | null;
+  status: Loan['status'];
+  notes?: string | null;
+  letter_url?: string | null;
+  approved_by?: string | null;
+  approved_at?: string | null;
+  return_condition?: string | null;
+  return_notes?: string | null;
+  created_at?: string | null;
+};
+
+type DbEquipment = {
+  id: string;
+  name: string;
+  description: string;
+  lab_id: string;
+  total_stock: number;
+  available_stock: number;
+  condition: string;
+  status: Equipment['status'];
+  image?: string | null;
+  category: string;
+  specifications?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+};
+
+type DbUserUpdate = Partial<{
+  name: string;
+  email: string;
+  role: User['role'];
+  nim: string | null;
+  kelas: string | null;
+  password_hash: string;
+}>;
+
+type DbLoanUpdate = Partial<{
+  status: Loan['status'];
+  actual_return_date: string;
+  return_condition: string;
+  return_notes: string;
+  approved_by: string;
+  approved_at: string;
+}>;
+
+type DbEquipmentUpdate = Partial<{
+  name: string;
+  description: string;
+  lab_id: string;
+  total_stock: number;
+  available_stock: number;
+  condition: string;
+  status: Equipment['status'];
+  image: string;
+  category: string;
+  specifications: string;
+}>;
+
+const getErrorMessage = (error: unknown) =>
+  error instanceof Error ? error.message : 'Terjadi kesalahan';
+
+const validRoles: User['role'][] = ['mahasiswa', 'admin', 'asisten', 'super_admin'];
+
+const isStoredUser = (value: unknown): value is User => {
+  if (!value || typeof value !== 'object') return false;
+
+  const user = value as Partial<User>;
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  return (
+    typeof user.id === 'string' &&
+    uuidRegex.test(user.id) &&
+    typeof user.name === 'string' &&
+    user.name.trim().length > 0 &&
+    typeof user.email === 'string' &&
+    user.email.trim().length > 0 &&
+    validRoles.includes(user.role as User['role'])
+  );
+};
+
+const mapLoanFromDb = (loan: DbLoan): Loan => ({
+  ...loan,
+  userId: loan.user_id,
+  userName: loan.user_name,
+  userNim: loan.user_nim || '',
+  userKelas: loan.user_kelas || '',
+  equipmentId: loan.equipment_id,
+  equipmentName: loan.equipment_name,
+  labId: loan.lab_id,
+  labName: loan.lab_name,
+  borrowDate: loan.borrow_date,
+  returnDate: loan.return_date,
+  actualReturnDate: loan.actual_return_date || undefined,
+  returnCondition: loan.return_condition || undefined,
+  returnNotes: loan.return_notes || undefined,
+  letterUrl: loan.letter_url || undefined,
+  approvedBy: loan.approved_by || undefined,
+  approvedAt: loan.approved_at || undefined,
+  notes: loan.notes || undefined,
+  createdAt: loan.created_at || new Date().toISOString()
+});
+
+const mapEquipmentFromDb = (equipment: DbEquipment): Equipment => ({
+  ...equipment,
+  labId: equipment.lab_id,
+  totalStock: equipment.total_stock,
+  availableStock: equipment.available_stock,
+  image: equipment.image || undefined,
+  specifications: equipment.specifications || undefined,
+  createdAt: equipment.created_at || new Date().toISOString(),
+  updatedAt: equipment.updated_at || equipment.created_at || new Date().toISOString()
+});
 
 interface StoreContextType {
   currentUser: User | null;
@@ -35,8 +161,9 @@ interface StoreContextType {
   markNotificationAsRead: (id: string) => void;
   addNotification: (notification: Omit<Notification, 'id' | 'createdAt'>) => void;
 
-  createLoan: (loan: Loan) => Promise<any>;
-  updateLoanStatus: (loanId: string, status: string, additionalData?: Partial<Loan>) => Promise<void>;
+  createLoan: (loan: Loan) => Promise<unknown>;
+  createEquipment: (equipment: Equipment) => Promise<void>;
+  updateLoanStatus: (loanId: string, status: Loan['status'], additionalData?: Partial<Loan>) => Promise<void>;
   deleteEquipment: (id: string) => Promise<void>;
   updateEquipment: (id: string, data: Partial<Equipment>) => Promise<void>;
   addActivityLog: (log: Omit<ActivityLog, 'id' | 'createdAt'>) => Promise<void>;
@@ -64,9 +191,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (storedUser) {
           try {
             const parsed = JSON.parse(storedUser);
-            // Validate that the stored user has a proper UUID format
-            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-            if (parsed.id && uuidRegex.test(parsed.id)) {
+            if (isStoredUser(parsed)) {
               setCurrentUser(parsed);
             } else {
               // Stale data with old format (e.g., 'usr-1'), clear it
@@ -94,36 +219,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           setLaboratories(mappedLabs as Laboratory[]);
         }
         if (eqRes.data) {
-          const mappedEq = eqRes.data.map(e => ({
-            ...e,
-            labId: e.lab_id,
-            totalStock: e.total_stock,
-            availableStock: e.available_stock,
-            createdAt: e.created_at || new Date().toISOString(),
-            updatedAt: e.updated_at || e.created_at || new Date().toISOString()
-          }));
-          setEquipment(mappedEq as Equipment[]);
+          setEquipment((eqRes.data as DbEquipment[]).map(mapEquipmentFromDb));
         }
         if (loansRes.data) {
-          // Map DB snake_case to camelCase
-          const mappedLoans = loansRes.data.map(l => ({
-            ...l,
-            userId: l.user_id,
-            userName: l.user_name,
-            userNim: l.user_nim,
-            userKelas: l.user_kelas,
-            equipmentId: l.equipment_id,
-            equipmentName: l.equipment_name,
-            labId: l.lab_id,
-            labName: l.lab_name,
-            borrowDate: l.borrow_date,
-            returnDate: l.return_date,
-            actualReturnDate: l.actual_return_date,
-            returnCondition: l.return_condition,
-            returnNotes: l.return_notes,
-            createdAt: l.created_at
-          }));
-          setLoans(mappedLoans as Loan[]);
+          setLoans((loansRes.data as DbLoan[]).map(mapLoanFromDb));
         }
         if (logsRes.data) {
           const mappedLogs = logsRes.data.map(l => ({
@@ -181,60 +280,34 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     const loansSub = supabase.channel('loans_changes')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'loans' }, (payload) => {
         console.log('Loan inserted:', payload.new);
-        const l = payload.new as any;
-        const newLoan: Loan = {
-          ...l,
-          userId: l.user_id, userName: l.user_name, userNim: l.user_nim, userKelas: l.user_kelas,
-          equipmentId: l.equipment_id, equipmentName: l.equipment_name,
-          labId: l.lab_id, labName: l.lab_name,
-          borrowDate: l.borrow_date, returnDate: l.return_date,
-          actualReturnDate: l.actual_return_date, returnCondition: l.return_condition,
-          returnNotes: l.return_notes, createdAt: l.created_at
-        };
+        const newLoan = mapLoanFromDb(payload.new as DbLoan);
         setLoans(prev => [newLoan, ...prev.filter(existing => existing.id !== newLoan.id)]);
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'loans' }, (payload) => {
         console.log('Loan updated:', payload.new);
-        const l = payload.new as any;
-        setLoans(prev => prev.map(loan => loan.id === l.id ? {
-          ...loan, ...l,
-          userId: l.user_id, userName: l.user_name, userNim: l.user_nim, userKelas: l.user_kelas,
-          equipmentId: l.equipment_id, equipmentName: l.equipment_name,
-          labId: l.lab_id, labName: l.lab_name,
-          borrowDate: l.borrow_date, returnDate: l.return_date,
-          actualReturnDate: l.actual_return_date, returnCondition: l.return_condition,
-          returnNotes: l.return_notes, createdAt: l.created_at,
-          status: l.status
-        } : loan));
+        const updatedLoan = mapLoanFromDb(payload.new as DbLoan);
+        setLoans(prev => prev.map(loan => loan.id === updatedLoan.id ? updatedLoan : loan));
       })
       .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'loans' }, (payload) => {
         console.log('Loan deleted:', payload.old);
-        setLoans(prev => prev.filter(l => l.id !== (payload.old as any).id));
+        setLoans(prev => prev.filter(l => l.id !== (payload.old as { id?: string }).id));
       })
       .subscribe();
 
     const eqSub = supabase.channel('equipment_changes')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'equipment' }, (payload) => {
         console.log('Equipment inserted:', payload.new);
-        const e = payload.new as any;
-        const newEq: Equipment = {
-          ...e, labId: e.lab_id, totalStock: e.total_stock, availableStock: e.available_stock,
-          createdAt: e.created_at || new Date().toISOString(),
-          updatedAt: e.updated_at || e.created_at || new Date().toISOString()
-        };
+        const newEq = mapEquipmentFromDb(payload.new as DbEquipment);
         setEquipment(prev => [...prev.filter(existing => existing.id !== newEq.id), newEq]);
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'equipment' }, (payload) => {
         console.log('Equipment updated:', payload.new);
-        const e = payload.new as any;
-        setEquipment(prev => prev.map(eq => eq.id === e.id ? {
-          ...eq, ...e, labId: e.lab_id, totalStock: e.total_stock, availableStock: e.available_stock,
-          updatedAt: e.updated_at || new Date().toISOString()
-        } : eq));
+        const updatedEq = mapEquipmentFromDb(payload.new as DbEquipment);
+        setEquipment(prev => prev.map(eq => eq.id === updatedEq.id ? updatedEq : eq));
       })
       .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'equipment' }, (payload) => {
         console.log('Equipment deleted:', payload.old);
-        setEquipment(prev => prev.filter(e => e.id !== (payload.old as any).id));
+        setEquipment(prev => prev.filter(e => e.id !== (payload.old as { id?: string }).id));
       })
       .subscribe();
 
@@ -243,36 +316,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       supabase.removeChannel(eqSub);
     };
   }, []);
-
-  // Check for overdue loans every minute — use ref to prevent infinite loops
-  const overdueCheckedRef = React.useRef<Set<string>>(new Set());
-  useEffect(() => {
-    const checkOverdueLoans = () => {
-      const now = new Date();
-      loans.forEach(loan => {
-        // Only process loans that are 'dipinjam' and haven't been checked yet
-        if (loan.status === 'dipinjam' && new Date(loan.returnDate) < now && !overdueCheckedRef.current.has(loan.id)) {
-          overdueCheckedRef.current.add(loan.id);
-          
-          // Update loan status to overdue
-          updateLoanStatus(loan.id, 'terlambat');
-
-          // Add notification for student
-          addNotification({
-            userId: loan.userId,
-            title: 'Alat Terlambat Dikembalikan',
-            message: `${loan.equipmentName} sudah melewati batas waktu pengembalian. Segera kembalikan untuk menghindari sanksi.`,
-            type: 'warning',
-            read: false
-          });
-        }
-      });
-    };
-
-    const interval = setInterval(checkOverdueLoans, 60000); // Check every minute
-    checkOverdueLoans(); // Check immediately on mount
-    return () => clearInterval(interval);
-  }, [loans]);
 
   const login = async (email: string, password: string): Promise<User | null> => {
     try {
@@ -485,13 +528,20 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const createUser = async (user: Omit<User, 'id' | 'createdAt'>): Promise<{ success: boolean; error?: string }> => {
     try {
-      // Validate email domain
-      if (!validateEmailDomain(user.email, user.role === 'mahasiswa' ? 'mahasiswa' : 'admin')) {
+      const normalizedEmail = user.email.trim().toLowerCase();
+
+      if (user.role === 'mahasiswa') {
+        const emailValidation = validateMahasiswaEmail(normalizedEmail, user.nim);
+        if (!emailValidation.valid) {
+          return {
+            success: false,
+            error: emailValidation.error || 'Email mahasiswa harus sesuai NIM'
+          };
+        }
+      } else if (!validateEmailDomain(normalizedEmail, user.role)) {
         return {
           success: false,
-          error: user.role === 'mahasiswa' 
-            ? 'Email mahasiswa harus format NIM@untirta.ac.id'
-            : 'Email admin harus @untirta.ac.id'
+          error: 'Email admin/asisten harus @untirta.ac.id'
         };
       }
 
@@ -515,7 +565,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       const { data, error } = await supabase
         .from('users')
         .insert([{
-          email: user.email,
+          email: normalizedEmail,
           name: user.name,
           role: user.role,
           nim: user.nim || null,
@@ -561,13 +611,38 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const updateUser = async (id: string, data: Partial<User>): Promise<{ success: boolean; error?: string }> => {
     try {
-      const updateData: any = {};
+      const existingUser = users.find(u => u.id === id);
+      const nextUser = { ...existingUser, ...data };
+      if (nextUser.email && nextUser.role) {
+        const normalizedEmail = nextUser.email.trim().toLowerCase();
+        if (nextUser.role === 'mahasiswa') {
+          const emailValidation = validateMahasiswaEmail(normalizedEmail, nextUser.nim);
+          if (!emailValidation.valid) {
+            return {
+              success: false,
+              error: emailValidation.error || 'Email mahasiswa harus sesuai NIM'
+            };
+          }
+        } else if (!validateEmailDomain(normalizedEmail, nextUser.role)) {
+          return {
+            success: false,
+            error: 'Email admin/asisten harus @untirta.ac.id'
+          };
+        }
+      }
+
+      const updateData: DbUserUpdate = {};
       
       if (data.name) updateData.name = data.name;
-      if (data.email) updateData.email = data.email;
+      if (data.email) updateData.email = data.email.trim().toLowerCase();
       if (data.role) updateData.role = data.role;
-      if (data.nim !== undefined) updateData.nim = data.nim;
-      if (data.kelas !== undefined) updateData.kelas = data.kelas;
+      if (data.role && data.role !== 'mahasiswa') {
+        updateData.nim = null;
+        updateData.kelas = null;
+      } else {
+        if (data.nim !== undefined) updateData.nim = data.nim;
+        if (data.kelas !== undefined) updateData.kelas = data.kelas;
+      }
       
       if (data.password) {
         updateData.password_hash = await hashPassword(data.password);
@@ -658,7 +733,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const getLab = (id: string) => laboratories.find(l => l.id === id);
   const getLoansByUser = (userId: string) => loans.filter(l => l.userId === userId);
   const getPendingLoans = () => loans.filter(l => l.status === 'menunggu');
-  const getActiveLoans = () => loans.filter(l => ['dipinjam', 'terlambat', 'disetujui'].includes(l.status));
+  const getActiveLoans = () => loans.filter(l => ['dipinjam', 'terlambat'].includes(l.status));
 
   const createLoan = async (loan: Loan) => {
     try {
@@ -700,16 +775,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       
       console.log('✅ Loan created successfully:', loan.id);
       return data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('❌ Failed to create loan:', error);
-      toast.error(error.message || 'Gagal membuat peminjaman');
+      toast.error(getErrorMessage(error));
       throw error;
     }
   };
 
-  const updateLoanStatus = async (loanId: string, status: string, additionalData?: Partial<Loan>) => {
+  const updateLoanStatus = React.useCallback(async (loanId: string, status: Loan['status'], additionalData?: Partial<Loan>) => {
     try {
-      const dbUpdate: any = { status };
+      const dbUpdate: DbLoanUpdate = { status };
       if (additionalData?.actualReturnDate) dbUpdate.actual_return_date = additionalData.actualReturnDate;
       if (additionalData?.returnCondition) dbUpdate.return_condition = additionalData.returnCondition;
       if (additionalData?.returnNotes) dbUpdate.return_notes = additionalData.returnNotes;
@@ -723,7 +798,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       }
 
       // Update local state immediately
-      setLoans(prev => prev.map(l => l.id === loanId ? { ...l, status: status as any, ...additionalData } : l));
+      setLoans(prev => prev.map(l => l.id === loanId ? { ...l, status, ...additionalData } : l));
 
       console.log('Loan updated successfully:', loanId);
     } catch (error) {
@@ -731,7 +806,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       toast.error('Gagal mengupdate peminjaman');
       throw error;
     }
-  };
+  }, []);
 
   const deleteEquipment = async (id: string) => {
     try {
@@ -749,19 +824,58 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const createEquipment = async (equipmentData: Equipment) => {
+    try {
+      const dbEquipment = {
+        id: equipmentData.id,
+        name: equipmentData.name,
+        description: equipmentData.description,
+        lab_id: equipmentData.labId,
+        total_stock: equipmentData.totalStock,
+        available_stock: equipmentData.availableStock,
+        condition: equipmentData.condition,
+        status: equipmentData.status,
+        image: equipmentData.image || null,
+        category: equipmentData.category,
+        specifications: equipmentData.specifications || null,
+        created_at: equipmentData.createdAt,
+        updated_at: equipmentData.updatedAt || equipmentData.createdAt
+      };
+
+      const { data, error } = await supabase
+        .from('equipment')
+        .insert([dbEquipment])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating equipment:', error);
+        throw error;
+      }
+
+      const createdEquipment = data ? mapEquipmentFromDb(data as DbEquipment) : equipmentData;
+      setEquipment(prev => [...prev.filter(e => e.id !== createdEquipment.id), createdEquipment]);
+      console.log('Equipment created successfully:', createdEquipment.id);
+    } catch (error) {
+      console.error('Failed to create equipment:', error);
+      toast.error('Gagal menambahkan alat');
+      throw error;
+    }
+  };
+
   const updateEquipment = async (id: string, data: Partial<Equipment>) => {
     try {
-      const dbUpdate: any = { ...data };
+      const dbUpdate: DbEquipmentUpdate = {};
+      if (data.name !== undefined) dbUpdate.name = data.name;
+      if (data.description !== undefined) dbUpdate.description = data.description;
+      if (data.condition !== undefined) dbUpdate.condition = data.condition;
+      if (data.status !== undefined) dbUpdate.status = data.status;
+      if (data.image !== undefined) dbUpdate.image = data.image;
+      if (data.category !== undefined) dbUpdate.category = data.category;
+      if (data.specifications !== undefined) dbUpdate.specifications = data.specifications;
       if (data.availableStock !== undefined) dbUpdate.available_stock = data.availableStock;
       if (data.totalStock !== undefined) dbUpdate.total_stock = data.totalStock;
       if (data.labId !== undefined) dbUpdate.lab_id = data.labId;
-
-      // Remove camelCase keys
-      delete dbUpdate.availableStock;
-      delete dbUpdate.totalStock;
-      delete dbUpdate.labId;
-      delete dbUpdate.createdAt;
-      delete dbUpdate.updatedAt;
 
       const { error } = await supabase.from('equipment').update(dbUpdate).eq('id', id);
       if (error) {
@@ -811,14 +925,38 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const getUnreadCount = () => notifications.filter(n => !n.read && n.userId === currentUser?.id).length;
 
-  const addNotification = (notification: Omit<Notification, 'id' | 'createdAt'>) => {
+  const addNotification = React.useCallback((notification: Omit<Notification, 'id' | 'createdAt'>) => {
     const newNotif: Notification = {
       ...notification,
       id: `notif-${Date.now()}`,
       createdAt: new Date().toISOString()
     };
     setNotifications(prev => [newNotif, ...prev]);
-  };
+  }, []);
+
+  const overdueCheckedRef = React.useRef<Set<string>>(new Set());
+  useEffect(() => {
+    const checkOverdueLoans = () => {
+      const now = new Date();
+      loans.forEach(loan => {
+        if (loan.status === 'dipinjam' && new Date(loan.returnDate) < now && !overdueCheckedRef.current.has(loan.id)) {
+          overdueCheckedRef.current.add(loan.id);
+          updateLoanStatus(loan.id, 'terlambat');
+          addNotification({
+            userId: loan.userId,
+            title: 'Alat Terlambat Dikembalikan',
+            message: `${loan.equipmentName} sudah melewati batas waktu pengembalian. Segera kembalikan untuk menghindari sanksi.`,
+            type: 'warning',
+            read: false
+          });
+        }
+      });
+    };
+
+    const interval = setInterval(checkOverdueLoans, 60000);
+    checkOverdueLoans();
+    return () => clearInterval(interval);
+  }, [loans, updateLoanStatus, addNotification]);
 
   const markNotificationAsRead = (id: string) => {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
@@ -830,7 +968,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       login, register, logout, 
       getAllUsers, createUser, updateUser, deleteUser,
       getEquipment, getLab, getLoansByUser, getPendingLoans, getActiveLoans, getUnreadCount,
-      createLoan, updateLoanStatus, deleteEquipment, updateEquipment, addActivityLog,
+      createLoan, createEquipment, updateLoanStatus, deleteEquipment, updateEquipment, addActivityLog,
       addNotification, markNotificationAsRead
     }}>
       {children}

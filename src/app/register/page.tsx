@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, User, CheckCircle2, XCircle, Hash, ChevronRight, Users, GraduationCap } from 'lucide-react';
 import { useStore } from '@/lib/store';
-import { validateNIMTeknikIndustri, validatePasswordStrength, parseNIM, validateMahasiswaEmail } from '@/lib/auth';
+import { validateNIMTeknikIndustri, validatePasswordStrength } from '@/lib/auth';
 import { Logo, PulseDot, DISPLAY, BODY, MONO } from '@/components/landing/shared';
 import toast from 'react-hot-toast';
 

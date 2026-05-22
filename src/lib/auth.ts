@@ -33,6 +33,9 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
  */
 export function validateEmailDomain(email: string, role: 'mahasiswa' | 'admin' | 'asisten' | 'super_admin'): boolean {
   const emailLower = email.toLowerCase();
+  if (role === 'mahasiswa') {
+    return /^3333\d{6}@untirta\.ac\.id$/.test(emailLower);
+  }
   return emailLower.endsWith('@untirta.ac.id');
 }
 
@@ -167,13 +170,7 @@ export function parseNIM(nim: string): {
   };
 }
 
-/**
- * Generate email from NIM
- */
-export function generateEmailFromNIM(nim: string, name?: string): string {
-  // Use NIM directly for the email format
-  return `${nim.trim()}@untirta.ac.id`;
-}
+
 
 /**
  * Validate password strength

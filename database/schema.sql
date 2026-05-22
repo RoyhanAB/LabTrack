@@ -142,15 +142,71 @@ CREATE INDEX idx_loans_status ON public.loans(status);
 CREATE INDEX idx_equipment_lab_id ON public.equipment(lab_id);
 
 -- ==========================================
+-- STEP 4B: Transaction Helpers
+-- ==========================================
+
+CREATE OR REPLACE FUNCTION public.approve_loan_transaction(
+  p_loan_id TEXT,
+  p_equipment_id TEXT,
+  p_quantity INTEGER,
+  p_approved_by TEXT,
+  p_approved_at TIMESTAMPTZ
+)
+RETURNS VOID
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  v_available_stock INTEGER;
+BEGIN
+  SELECT available_stock
+  INTO v_available_stock
+  FROM public.equipment
+  WHERE id = p_equipment_id
+  FOR UPDATE;
+
+  IF v_available_stock IS NULL THEN
+    RAISE EXCEPTION 'Alat tidak ditemukan';
+  END IF;
+
+  IF v_available_stock < p_quantity THEN
+    RAISE EXCEPTION 'Stok tidak mencukupi';
+  END IF;
+
+  UPDATE public.loans
+  SET
+    status = 'dipinjam',
+    approved_by = p_approved_by,
+    approved_at = p_approved_at
+  WHERE id = p_loan_id
+    AND equipment_id = p_equipment_id
+    AND status = 'menunggu';
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Peminjaman sudah diproses atau tidak ditemukan';
+  END IF;
+
+  UPDATE public.equipment
+  SET
+    available_stock = available_stock - p_quantity,
+    status = CASE
+      WHEN available_stock - p_quantity <= 0 THEN 'dipinjam'
+      ELSE 'tersedia'
+    END,
+    updated_at = now()
+  WHERE id = p_equipment_id;
+END;
+$$;
+
+-- ==========================================
 -- STEP 5: Seed Data
 -- ==========================================
 
 -- Laboratories
 INSERT INTO public.laboratories (id, name, full_name, description, location, image) VALUES
-('lsi', 'LSIPro', 'Laboratorium Sistem Informasi dan Proses', 'Fokus pada pengembangan sistem informasi, pemodelan proses bisnis, dan rekayasa perangkat lunak.', 'Lantai 2, Gedung A', 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=2070&auto=format&fit=crop'),
+('lsi', 'LSIPro', 'Laboratorium Sistem Produksi', 'Fokus pada simulasi proses produksi dan analisis produktivitas kerja.', 'Lantai 2, Gedung A', 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=2070&auto=format&fit=crop'),
 ('rske', 'RSK&E', 'Laboratorium Rekayasa Sistem Kerja dan Ergonomi', 'Fokus pada perancangan sistem kerja, analisis biomekanika, dan lingkungan kerja fisik.', 'Lantai 1, Gedung B', 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop'),
 ('osik', 'OSI&K', 'Laboratorium Optimasi Sistem Industri dan Kualitas', 'Fokus pada riset operasi, pengendalian kualitas statistik, dan optimasi rantai pasok.', 'Lantai 2, Gedung B', 'https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1470&auto=format&fit=crop'),
-('smi', 'SMI', 'Laboratorium Sistem Manufaktur dan Inovasi', 'Fokus pada perancangan produk, proses manufaktur, CNC, dan otomatisasi industri.', 'Lantai Dasar, Gedung C', 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=2070&auto=format&fit=crop');
+('smi', 'SMI', 'Studio Manajemen Industri', 'Fokus pada simulasi manajemen industri, perencanaan produksi, analisis sistem bisnis, dan pengambilan keputusan.', 'Lantai Dasar, Gedung C', 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=2070&auto=format&fit=crop');
 
 -- ==========================================
 -- USERS — PASSWORD = SHA-256 HASH

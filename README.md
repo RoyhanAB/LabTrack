@@ -33,10 +33,10 @@
 
 ### 🏢 Laboratorium yang Didukung
 
-1. **LSIPro** - Lab. Sistem Informasi & Produktivitas
+1. **LSIPro** - Lab. Sistem Produksi
 2. **RSK&E** - Lab. Rekayasa Sistem Kerja & Ergonomi
 3. **OSI&K** - Lab. Optimasi Sistem Industri & Kualitas
-4. **SMI** - Lab. Sistem Manufaktur Industri
+4. **SMI** - Studio Manajemen Industri
 
 ## 🚀 Teknologi
 
@@ -47,10 +47,9 @@
 - **Database**: Supabase (PostgreSQL)
 - **State Management**: React Context API
 - **Icons**: Lucide React
-- **Charts**: Recharts
+- **Animations**: Framer Motion
 - **Notifications**: React Hot Toast
 - **Date Handling**: date-fns
-- **Validation**: Zod
 
 ## 📦 Instalasi
 
@@ -93,7 +92,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 Jalankan SQL schema di Supabase SQL Editor:
 
 ```bash
-# File: supabase-schema.sql
+# File: database/schema.sql
 # Copy dan paste isi file ke Supabase SQL Editor
 ```
 
@@ -279,7 +278,6 @@ Sistem menggunakan Supabase Realtime untuk update otomatis:
 ## 🔐 Security
 
 - ✅ Row Level Security (RLS) di Supabase
-- ✅ Client-side validation dengan Zod
 - ✅ Protected routes dengan middleware
 - ✅ Secure file upload validation
 - ✅ SQL injection prevention
@@ -321,12 +319,16 @@ src/
 ├── components/       # Reusable components
 │   └── layout/      # Layout components
 ├── lib/             # Utilities & helpers
-│   ├── data.ts      # Demo data
 │   ├── store.tsx    # Global state management
 │   ├── supabase.ts  # Supabase client
 │   └── types.ts     # TypeScript types
 └── ...
 ```
+
+### 📚 Dokumentasi Ekstra
+
+Untuk panduan penggunaan lengkap, integrasi, pemecahan masalah, dan changelog, silakan merujuk ke file:
+- `docs/DOKUMENTASI_LENGKAP.md`
 
 ## 🐛 Known Issues & Limitations
 

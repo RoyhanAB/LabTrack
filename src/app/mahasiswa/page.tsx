@@ -1,14 +1,12 @@
 'use client';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useStore } from '@/lib/store';
-import { Package, Clock, AlertTriangle, CheckCircle, ArrowRight, Activity, Calendar, PackageSearch, History } from 'lucide-react';
+import { Package, AlertTriangle, CheckCircle, ArrowRight, Activity, Calendar, PackageSearch, History } from 'lucide-react';
 import Link from 'next/link';
 
 export default function MahasiswaDashboard() {
   const { equipment, getLoansByUser, currentUser, isLoading } = useStore();
   
-  if (!currentUser) return null;
-
   if (isLoading) {
     return (
       <DashboardLayout role="mahasiswa">
@@ -18,6 +16,8 @@ export default function MahasiswaDashboard() {
       </DashboardLayout>
     );
   }
+
+  if (!currentUser) return null;
 
   const myLoans = getLoansByUser(currentUser.id);
   const activeLoans = myLoans.filter(l => ['dipinjam', 'menunggu', 'terlambat'].includes(l.status));

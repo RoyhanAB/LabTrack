@@ -4,9 +4,14 @@ import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useStore } from '@/lib/store';
 import { supabase } from '@/lib/supabase';
-import { ArrowLeft, Package, Calendar, Clock, Info, CheckCircle2, AlertCircle, FileText, Upload } from 'lucide-react';
+import { ArrowLeft, Package, Calendar, Info, CheckCircle2, AlertCircle, Upload } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+
+const parseQuantityInput = (value: string) => {
+  const parsed = Number.parseInt(value, 10);
+  return Number.isNaN(parsed) ? 1 : parsed;
+};
 
 export default function DetailAlatPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -21,6 +26,7 @@ export default function DetailAlatPage({ params }: { params: Promise<{ id: strin
   const [returnDate, setReturnDate] = useState('');
   const [purpose, setPurpose] = useState('');
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [isSubmittingLoan, setIsSubmittingLoan] = useState(false);
   
   if (isLoading) {
     return (
@@ -42,7 +48,12 @@ export default function DetailAlatPage({ params }: { params: Promise<{ id: strin
 
   const handleBorrow = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmittingLoan) return;
     
+    if (eq.status !== 'tersedia') {
+      toast.error('Alat belum tersedia untuk dipinjam');
+      return;
+    }
     if (quantity < 1 || quantity > eq.availableStock) {
       toast.error('Jumlah tidak valid');
       return;
@@ -51,7 +62,13 @@ export default function DetailAlatPage({ params }: { params: Promise<{ id: strin
       toast.error('Tanggal kembali harus diisi');
       return;
     }
+    const selectedReturnDate = new Date(`${returnDate}T23:59:59`);
+    if (Number.isNaN(selectedReturnDate.getTime()) || selectedReturnDate < new Date()) {
+      toast.error('Tanggal kembali tidak boleh lebih awal dari hari ini');
+      return;
+    }
 
+    setIsSubmittingLoan(true);
     try {
       const loanId = `loan-${Date.now()}`;
       let letterUrl: string | undefined;
@@ -93,7 +110,7 @@ export default function DetailAlatPage({ params }: { params: Promise<{ id: strin
         labName: lab.name,
         quantity,
         borrowDate: new Date().toISOString(),
-        returnDate: new Date(returnDate).toISOString(),
+        returnDate: selectedReturnDate.toISOString(),
         status: 'menunggu',
         notes: purpose,
         letterUrl,
@@ -123,9 +140,11 @@ export default function DetailAlatPage({ params }: { params: Promise<{ id: strin
       setTimeout(() => {
         router.push('/mahasiswa/status');
       }, 500);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('❌ Error creating loan:', error);
-      toast.error(error.message || 'Gagal mengirim pengajuan. Silakan coba lagi.');
+      toast.error(error instanceof Error ? error.message : 'Gagal mengirim pengajuan. Silakan coba lagi.');
+    } finally {
+      setIsSubmittingLoan(false);
     }
   };
 
@@ -220,7 +239,7 @@ export default function DetailAlatPage({ params }: { params: Promise<{ id: strin
               <>
                 <h3 className="text-xl font-bold text-navy-800 mb-6 font-[family-name:var(--font-heading)]">Ajukan Peminjaman</h3>
                 
-                {eq.availableStock > 0 ? (
+                {eq.availableStock > 0 && eq.status === 'tersedia' ? (
                   <>
                     <div className="flex items-start gap-3 p-4 rounded-xl bg-blue-50 border border-blue-100 mb-6">
                       <Info className="w-5 h-5 text-info shrink-0 mt-0.5" />
@@ -259,7 +278,7 @@ export default function DetailAlatPage({ params }: { params: Promise<{ id: strin
                     min="1" 
                     max={eq.availableStock}
                     value={quantity}
-                    onChange={e => setQuantity(parseInt(e.target.value))}
+                    onChange={e => setQuantity(Math.min(Math.max(parseQuantityInput(e.target.value), 1), eq.availableStock))}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent-cyan/30 focus:border-accent-cyan outline-none"
                     required
                   />
@@ -318,9 +337,13 @@ export default function DetailAlatPage({ params }: { params: Promise<{ id: strin
                 </div>
 
                 <div className="pt-2">
-                  <button type="submit" className="w-full py-3.5 rounded-xl bg-accent-cyan text-white font-bold text-sm hover:bg-accent-cyan-dark shadow-lg shadow-accent-cyan/20 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
-                    <CheckCircle2 className="w-4 h-4" />
-                    Kirim Pengajuan
+                  <button type="submit" disabled={isSubmittingLoan} className="w-full py-3.5 rounded-xl bg-accent-cyan text-white font-bold text-sm hover:bg-accent-cyan-dark shadow-lg shadow-accent-cyan/20 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+                    {isSubmittingLoan ? (
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <CheckCircle2 className="w-4 h-4" />
+                    )}
+                    {isSubmittingLoan ? 'Mengirim...' : 'Kirim Pengajuan'}
                   </button>
                 </div>
               </form>

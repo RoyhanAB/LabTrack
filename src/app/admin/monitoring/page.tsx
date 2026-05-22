@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useStore } from '@/lib/store';
-import { Activity, Download, Search, Calendar as CalendarIcon, User, Package, TrendingUp } from 'lucide-react';
+import { Activity, Download, Search, Calendar as CalendarIcon, User, TrendingUp } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';

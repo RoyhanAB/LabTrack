@@ -3,15 +3,17 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useStore } from '@/lib/store';
-import { Users, UserCheck, Shield, Activity, Plus, Edit2, Trash2, Search, Filter } from 'lucide-react';
+import { Users, UserCheck, Shield, Activity, Plus, Edit2, Trash2, Search } from 'lucide-react';
 import { User } from '@/lib/types';
 import toast from 'react-hot-toast';
+
+type RoleFilter = User['role'] | 'all';
 
 export default function SuperAdminPage() {
   const router = useRouter();
   const { currentUser, users, getAllUsers, createUser, updateUser, deleteUser, isLoading } = useStore();
   const [searchQuery, setSearchQuery] = useState('');
-  const [roleFilter, setRoleFilter] = useState<'all' | 'mahasiswa' | 'admin' | 'asisten' | 'super_admin'>('all');
+  const [roleFilter, setRoleFilter] = useState<RoleFilter>('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -64,7 +66,7 @@ export default function SuperAdminPage() {
     },
     {
       label: 'Admin/Asisten',
-      value: users.filter(u => u.role === 'admin').length,
+      value: users.filter(u => u.role === 'admin' || u.role === 'asisten').length,
       icon: Shield,
       color: 'from-orange-500 to-amber-600',
       bgColor: 'bg-orange-50',
@@ -94,8 +96,8 @@ export default function SuperAdminPage() {
       name: formData.name,
       email: formData.email,
       role: formData.role,
-      nim: formData.nim || undefined,
-      kelas: formData.kelas || undefined,
+      nim: formData.role === 'mahasiswa' ? formData.nim || undefined : undefined,
+      kelas: formData.role === 'mahasiswa' ? formData.kelas || undefined : undefined,
       password: formData.password
     });
 
@@ -116,8 +118,8 @@ export default function SuperAdminPage() {
       name: formData.name,
       email: formData.email,
       role: formData.role,
-      nim: formData.nim || undefined,
-      kelas: formData.kelas || undefined
+      nim: formData.role === 'mahasiswa' ? formData.nim || undefined : undefined,
+      kelas: formData.role === 'mahasiswa' ? formData.kelas || undefined : undefined
     };
 
     if (formData.password) {
@@ -244,7 +246,7 @@ export default function SuperAdminPage() {
             <div className="flex gap-2 w-full sm:w-auto">
               <select
                 value={roleFilter}
-                onChange={e => setRoleFilter(e.target.value as any)}
+                onChange={e => setRoleFilter(e.target.value as RoleFilter)}
                 className="px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-accent-cyan/30 focus:border-accent-cyan"
               >
                 <option value="all">Semua Role</option>
@@ -364,7 +366,10 @@ export default function SuperAdminPage() {
                 <label className="block text-sm font-medium text-navy-700 mb-1">Role</label>
                 <select
                   value={formData.role}
-                  onChange={e => setFormData({ ...formData, role: e.target.value as any })}
+                  onChange={e => {
+                    const role = e.target.value as User['role'];
+                    setFormData({ ...formData, role, nim: role === 'mahasiswa' ? formData.nim : '', kelas: role === 'mahasiswa' ? formData.kelas : '' });
+                  }}
                   className="w-full px-4 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-accent-cyan/30"
                 >
                   <option value="mahasiswa">Mahasiswa</option>
@@ -459,7 +464,10 @@ export default function SuperAdminPage() {
                 <label className="block text-sm font-medium text-navy-700 mb-1">Role</label>
                 <select
                   value={formData.role}
-                  onChange={e => setFormData({ ...formData, role: e.target.value as any })}
+                  onChange={e => {
+                    const role = e.target.value as User['role'];
+                    setFormData({ ...formData, role, nim: role === 'mahasiswa' ? formData.nim : '', kelas: role === 'mahasiswa' ? formData.kelas : '' });
+                  }}
                   className="w-full px-4 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-accent-cyan/30"
                 >
                   <option value="mahasiswa">Mahasiswa</option>

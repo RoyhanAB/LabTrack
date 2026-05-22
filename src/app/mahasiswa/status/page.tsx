@@ -9,8 +9,6 @@ import { id } from 'date-fns/locale';
 export default function StatusPeminjamanPage() {
   const { getLoansByUser, currentUser, isLoading } = useStore();
   
-  if (!currentUser) return null;
-
   if (isLoading) {
     return (
       <DashboardLayout role="mahasiswa">
@@ -20,6 +18,8 @@ export default function StatusPeminjamanPage() {
       </DashboardLayout>
     );
   }
+
+  if (!currentUser) return null;
 
   const myLoans = getLoansByUser(currentUser.id).filter(l => ['menunggu', 'disetujui', 'dipinjam', 'terlambat'].includes(l.status));
   
@@ -49,8 +49,6 @@ export default function StatusPeminjamanPage() {
           {myLoans.map((loan, i) => {
             const isLate = loan.status === 'terlambat';
             const isActive = loan.status === 'dipinjam';
-            const isPending = loan.status === 'menunggu';
-            
             const returnDate = new Date(loan.returnDate);
             const today = new Date();
             const daysLeft = differenceInDays(returnDate, today);

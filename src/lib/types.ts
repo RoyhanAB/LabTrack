@@ -1,8 +1,8 @@
-export type UserRole = 'mahasiswa' | 'admin' | 'asisten' | 'super_admin';
-export type EquipmentStatus = 'tersedia' | 'dipinjam' | 'maintenance';
-export type LoanStatus = 'menunggu' | 'disetujui' | 'ditolak' | 'dipinjam' | 'dikembalikan' | 'terlambat';
-export type LabName = 'LSIPro' | 'RSK&E' | 'OSI&K' | 'SMI';
-export type ActivityType = 'login' | 'peminjaman' | 'pengembalian' | 'approve' | 'reject' | 'tambah_alat' | 'edit_alat' | 'hapus_alat' | 'update_status' | 'register' | 'tambah_user' | 'hapus_user' | 'edit_user';
+type UserRole = 'mahasiswa' | 'admin' | 'asisten' | 'super_admin';
+type EquipmentStatus = 'tersedia' | 'dipinjam' | 'maintenance';
+type LoanStatus = 'menunggu' | 'disetujui' | 'ditolak' | 'dipinjam' | 'dikembalikan' | 'terlambat';
+type LabName = 'LSIPro' | 'RSK&E' | 'OSI&K' | 'SMI';
+type ActivityType = 'login' | 'peminjaman' | 'pengembalian' | 'approve' | 'reject' | 'tambah_alat' | 'edit_alat' | 'hapus_alat' | 'update_status' | 'register' | 'tambah_user' | 'hapus_user' | 'edit_user';
 
 export interface User {
   id: string;

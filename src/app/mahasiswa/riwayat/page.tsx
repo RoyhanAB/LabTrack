@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useStore } from '@/lib/store';
-import { History, Search, Filter, Calendar as CalendarIcon, CheckCircle2, AlertTriangle, FileText } from 'lucide-react';
+import { History, Search, Calendar as CalendarIcon, CheckCircle2, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
@@ -10,8 +10,6 @@ export default function RiwayatPage() {
   const { getLoansByUser, currentUser, isLoading } = useStore();
   const [search, setSearch] = useState('');
   
-  if (!currentUser) return null;
-
   if (isLoading) {
     return (
       <DashboardLayout role="mahasiswa">
@@ -21,6 +19,8 @@ export default function RiwayatPage() {
       </DashboardLayout>
     );
   }
+
+  if (!currentUser) return null;
 
   const historyLoans = getLoansByUser(currentUser.id)
     .filter(l => ['dikembalikan', 'ditolak'].includes(l.status))

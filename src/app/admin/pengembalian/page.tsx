@@ -18,6 +18,7 @@ export default function PengembalianPage() {
   } | null>(null);
   const [returnCondition, setReturnCondition] = useState('Baik');
   const [returnNotes, setReturnNotes] = useState('');
+  const [isProcessingReturn, setIsProcessingReturn] = useState(false);
   
   const activeLoans = getActiveLoans().sort((a, b) => new Date(a.borrowDate).getTime() - new Date(b.borrowDate).getTime());
   
@@ -35,15 +36,21 @@ export default function PengembalianPage() {
   };
 
   const handleReturn = async () => {
-    if (!returnTarget) return;
+    if (!returnTarget || isProcessingReturn) return;
     const { loanId, equipmentId, quantity, eqName, userName, userId } = returnTarget;
+    setIsProcessingReturn(true);
 
     try {
       const eq = getEquipment(equipmentId);
       if (eq) {
+        const canReturnToAvailableStock = returnCondition === 'Baik';
+        const nextAvailableStock = canReturnToAvailableStock
+          ? Math.min(eq.totalStock, eq.availableStock + quantity)
+          : eq.availableStock;
+
         await updateEquipment(equipmentId, { 
-          availableStock: eq.availableStock + quantity,
-          status: 'tersedia'
+          availableStock: nextAvailableStock,
+          status: nextAvailableStock > 0 ? 'tersedia' : 'maintenance'
         });
       }
 
@@ -56,7 +63,7 @@ export default function PengembalianPage() {
       addActivityLog({
         userId: currentUser!.id,
         userName: currentUser!.name,
-        userRole: 'admin',
+        userRole: currentUser!.role,
         type: 'pengembalian',
         description: `Menerima pengembalian ${eqName} (${quantity} unit) dari ${userName}. Kondisi: ${returnCondition}`
       });
@@ -76,6 +83,8 @@ export default function PengembalianPage() {
     } catch (error) {
       console.error('Error processing return:', error);
       toast.error('Gagal memproses pengembalian');
+    } finally {
+      setIsProcessingReturn(false);
     }
   };
 
@@ -225,10 +234,15 @@ export default function PengembalianPage() {
                 <button
                   type="button"
                   onClick={handleReturn}
-                  className="flex-1 py-3 rounded-xl bg-success text-white font-bold hover:bg-success/90 shadow-md shadow-success/20 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                  disabled={isProcessingReturn}
+                  className="flex-1 py-3 rounded-xl bg-success text-white font-bold hover:bg-success/90 shadow-md shadow-success/20 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  <CheckCircle2 className="w-4 h-4" />
-                  Konfirmasi
+                  {isProcessingReturn ? (
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="w-4 h-4" />
+                  )}
+                  {isProcessingReturn ? 'Memproses...' : 'Konfirmasi'}
                 </button>
               </div>
             </div>

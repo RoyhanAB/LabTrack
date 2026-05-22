@@ -30,15 +30,15 @@ export default function LandingPage() {
   const labs = useCountUp(totalLabs);
   const users = useCountUp(userCount);
 
-  // Get active loans (pending or dipinjam)
+  // Get active loans (pending, borrowed, or overdue)
   const activeLoans = loans
-    .filter(l => l.status === 'menunggu' || l.status === 'dipinjam')
+    .filter(l => ['menunggu', 'dipinjam', 'terlambat'].includes(l.status))
     .slice(0, 3)
     .map(l => ({
       name: l.equipmentName,
       lab: l.labName,
       user: l.userName.split(' ')[0], // First name only
-      ok: l.status === 'dipinjam'
+      status: l.status
     }));
 
   useEffect(() => {
@@ -118,7 +118,11 @@ export default function LandingPage() {
                     {activeLoans.length > 0 ? activeLoans.map((item, i) => (
                       <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-[#060D1A] border border-white/5 hover:border-teal-500/15 transition-colors">
                         <div className="min-w-0"><div className="text-white text-[13px] font-medium truncate mb-0.5" style={{fontFamily:BODY}}>{item.name}</div><div className="text-slate-600 text-[11px]" style={{fontFamily:MONO}}>{item.lab} · {item.user}</div></div>
-                        <span className={`ml-3 text-[11px] px-2 py-0.5 rounded font-medium flex-shrink-0 ${item.ok?'bg-teal-500/10 text-teal-400':'bg-orange-500/10 text-orange-400'}`} style={{fontFamily:MONO}}>{item.ok?'DIPINJAM':'REVIEW'}</span>
+                        <span className={`ml-3 text-[11px] px-2 py-0.5 rounded font-medium flex-shrink-0 ${
+                          item.status === 'dipinjam' ? 'bg-teal-500/10 text-teal-400' :
+                          item.status === 'terlambat' ? 'bg-red-500/10 text-red-400' :
+                          'bg-orange-500/10 text-orange-400'
+                        }`} style={{fontFamily:MONO}}>{item.status === 'dipinjam' ? 'DIPINJAM' : item.status === 'terlambat' ? 'TERLAMBAT' : 'REVIEW'}</span>
                       </div>
                     )) : (
                       <div className="p-4 text-center border border-white/5 rounded-lg bg-[#060D1A]/50">
@@ -184,10 +188,10 @@ export default function LandingPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {[
-              {id:'LSIPro',name:'Lab. Sistem Informasi & Produktivitas',desc:'Simulasi proses produksi dan analisis produktivitas kerja',icon:Monitor,color:'bg-blue-500',count:18,active:true},
-              {id:'RSK&E',name:'Lab. Rekayasa Sistem Kerja & Ergonomi',desc:'Perancangan sistem kerja dan analisis ergonomi',icon:Users,color:'bg-orange-500',count:22,active:true},
-              {id:'OSI&K',name:'Lab. Optimasi Sistem Industri & Kualitas',desc:'Pengendalian kualitas produk dan optimasi proses industri',icon:Wrench,color:'bg-teal-500',count:15,active:true},
-              {id:'SMI',name:'Lab. Sistem Manufaktur & Inovasi',desc:'Proses manufaktur, permesinan, dan fabrikasi material',icon:Gauge,color:'bg-violet-500',count:8,active:false},
+              {id:'LSIPro',labId:'lsi',name:'Lab. Sistem Produksi',desc:'Simulasi proses produksi dan analisis produktivitas kerja',icon:Monitor,color:'bg-blue-500',active:true},
+              {id:'RSK&E',labId:'rske',name:'Lab. Rekayasa Sistem Kerja & Ergonomi',desc:'Perancangan sistem kerja dan analisis ergonomi',icon:Users,color:'bg-orange-500',active:true},
+              {id:'OSI&K',labId:'osik',name:'Lab. Optimasi Sistem Industri & Kualitas',desc:'Pengendalian kualitas produk dan optimasi proses industri',icon:Wrench,color:'bg-teal-500',active:true},
+              {id:'SMI',labId:'smi',name:'Studio Manajemen Industri',desc:'Simulasi manajemen industri, perencanaan produksi, dan analisis sistem bisnis',icon:Gauge,color:'bg-violet-500',active:true},
             ].map((lab,i)=>(
               <motion.div key={lab.id} initial={{opacity:0,scale:0.96}} whileInView={{opacity:1,scale:1}} viewport={{once:true}} transition={{delay:i*0.08}} whileHover={{y:-4}} className="group relative p-6 rounded-xl border border-slate-200 bg-white hover:border-teal-300/60 transition-all duration-300 cursor-pointer overflow-hidden">
                 <div className="flex items-start gap-4">
@@ -200,7 +204,7 @@ export default function LandingPage() {
                     <h3 className="text-[17px] font-bold text-slate-900 leading-snug mb-1.5" style={{fontFamily:DISPLAY}}>{lab.name}</h3>
                     <p className="text-slate-500 text-sm mb-4" style={{fontFamily:BODY}}>{lab.desc}</p>
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] text-slate-400" style={{fontFamily:MONO}}>{lab.count} alat terdaftar</span>
+                      <span className="text-[11px] text-slate-400" style={{fontFamily:MONO}}>{equipment.filter(item => item.labId === lab.labId).length} alat terdaftar</span>
                       <div className="flex items-center gap-1 text-slate-400 group-hover:text-teal-500 transition-colors"><span className="text-[12px] font-medium" style={{fontFamily:BODY}}>Lihat Alat</span><ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform"/></div>
                     </div>
                   </div>

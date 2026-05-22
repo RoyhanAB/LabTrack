@@ -7,8 +7,6 @@ import Link from 'next/link';
 export default function AdminDashboard() {
   const { equipment, loans, activityLogs, currentUser, isLoading } = useStore();
   
-  if (!currentUser) return null;
-
   if (isLoading) {
     return (
       <DashboardLayout role="admin">
@@ -18,6 +16,8 @@ export default function AdminDashboard() {
       </DashboardLayout>
     );
   }
+
+  if (!currentUser) return null;
 
   const totalEq = equipment.reduce((sum, eq) => sum + eq.totalStock, 0);
   const activeLoans = loans.filter(l => ['dipinjam', 'terlambat'].includes(l.status));

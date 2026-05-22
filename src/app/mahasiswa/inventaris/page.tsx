@@ -2,7 +2,7 @@
 import { useState, useMemo } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useStore } from '@/lib/store';
-import { Search, Filter, Package, Info, ArrowRight } from 'lucide-react';
+import { Search, Package, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 export default function InventarisPage() {
@@ -21,7 +21,7 @@ export default function InventarisPage() {
       
       return matchSearch && matchLab && matchStatus;
     });
-  }, [equipment, search, selectedLab, selectedStatus]);
+  }, [equipment, isLoading, search, selectedLab, selectedStatus]);
 
   return (
     <DashboardLayout role="mahasiswa">

@@ -12,7 +12,7 @@ const gridBg = { backgroundColor:'#060D1A', backgroundImage:'linear-gradient(rgb
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login } = useStore();
+  const { login, logout } = useStore();
   const [role, setRole] = useState<'mahasiswa'|'admin'>('mahasiswa');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -22,10 +22,31 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) { toast.error('Email dan password wajib diisi'); return; }
+    const normalizedEmail = email.trim().toLowerCase();
+    const mahasiswaEmailPattern = /^3333\d{6}@untirta\.ac\.id$/;
+    if (role === 'mahasiswa' && !mahasiswaEmailPattern.test(normalizedEmail)) {
+      toast.error('Email mahasiswa harus format NIM@untirta.ac.id');
+      return;
+    }
+    if (role === 'admin' && mahasiswaEmailPattern.test(normalizedEmail)) {
+      toast.error('Gunakan tab Mahasiswa untuk akun mahasiswa');
+      return;
+    }
+
     setLoading(true);
     try {
-      const user = await login(email.trim().toLowerCase(), password);
+      const user = await login(normalizedEmail, password);
       if (user) {
+        const roleMatchesSelection = role === 'mahasiswa'
+          ? user.role === 'mahasiswa'
+          : ['admin', 'asisten', 'super_admin'].includes(user.role);
+
+        if (!roleMatchesSelection) {
+          logout();
+          toast.error(`Akun ini bukan akun ${role === 'mahasiswa' ? 'mahasiswa' : 'administrasi'}`);
+          return;
+        }
+
         toast.success(`Selamat datang, ${user.name}!`);
         const r = user.role;
         router.push(r === 'mahasiswa' ? '/mahasiswa' : r === 'super_admin' ? '/super-admin' : '/admin');
