@@ -36,13 +36,13 @@ export default function RiwayatPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 animate-fade-in-up">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-800 font-[family-name:var(--font-heading)]">Riwayat Peminjaman</h1>
-          <p className="text-gray-500 mt-1">Rekam jejak peminjaman alat laboratorium Anda.</p>
+          <p className="text-slate-600 mt-1">Rekam jejak peminjaman alat laboratorium Anda.</p>
         </div>
       </div>
 
       <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm mb-6 animate-fade-in-up stagger-2">
         <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
           <input 
             type="text" 
             placeholder="Cari berdasarkan nama alat atau laboratorium..." 
@@ -56,10 +56,10 @@ export default function RiwayatPage() {
       {filteredHistory.length === 0 ? (
         <div className="bg-white rounded-2xl p-12 border border-gray-100 shadow-sm text-center animate-fade-in-up stagger-3">
           <div className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
-            <History className="w-8 h-8 text-gray-300" />
+            <History className="w-8 h-8 text-slate-400" />
           </div>
           <h3 className="text-lg font-bold text-navy-800 mb-2">Tidak ada riwayat</h3>
-          <p className="text-gray-500">Belum ada riwayat peminjaman yang selesai atau ditolak.</p>
+          <p className="text-slate-600">Belum ada riwayat peminjaman yang selesai atau ditolak.</p>
         </div>
       ) : (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden animate-fade-in-up stagger-3">
@@ -79,7 +79,7 @@ export default function RiwayatPage() {
                   <tr key={loan.id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="py-4 px-6">
                       <div className="font-bold text-navy-800">{loan.equipmentName}</div>
-                      <div className="text-xs text-gray-500 flex items-center gap-2 mt-0.5">
+                      <div className="text-xs text-slate-600 flex items-center gap-2 mt-0.5">
                         <span>{loan.quantity} Unit</span>
                         <span className="w-1 h-1 rounded-full bg-gray-300" />
                         <span>{loan.labName}</span>
@@ -87,7 +87,7 @@ export default function RiwayatPage() {
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-1.5 text-sm text-navy-800 font-medium whitespace-nowrap">
-                        <CalendarIcon className="w-4 h-4 text-gray-400" />
+                        <CalendarIcon className="w-4 h-4 text-slate-500" />
                         {format(new Date(loan.borrowDate), 'dd MMM yyyy', { locale: id })}
                       </div>
                     </td>
@@ -98,7 +98,7 @@ export default function RiwayatPage() {
                           {format(new Date(loan.actualReturnDate), 'dd MMM yyyy', { locale: id })}
                         </div>
                       ) : (
-                        <span className="text-sm text-gray-400">-</span>
+                        <span className="text-sm text-slate-500">-</span>
                       )}
                     </td>
                     <td className="py-4 px-6">
@@ -109,11 +109,11 @@ export default function RiwayatPage() {
                     <td className="py-4 px-6 text-right">
                       {loan.returnCondition ? (
                         <div className="inline-flex items-center gap-1.5 text-sm text-gray-600 bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">
-                          <FileText className="w-4 h-4 text-gray-500" />
+                          <FileText className="w-4 h-4 text-slate-600" />
                           {loan.returnCondition}
                         </div>
                       ) : (
-                        <span className="text-sm text-gray-400">-</span>
+                        <span className="text-sm text-slate-500">-</span>
                       )}
                     </td>
                   </tr>

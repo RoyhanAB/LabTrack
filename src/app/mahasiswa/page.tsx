@@ -29,7 +29,7 @@ export default function MahasiswaDashboard() {
     <DashboardLayout role="mahasiswa">
       <div className="mb-8 animate-fade-in-up">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-800 font-[family-name:var(--font-heading)]">Dashboard</h1>
-        <p className="text-gray-500 mt-1">Selamat datang kembali, {currentUser.name}</p>
+        <p className="text-slate-600 mt-1">Selamat datang kembali, {currentUser.name}</p>
       </div>
 
       {/* Stats Grid */}
@@ -48,7 +48,7 @@ export default function MahasiswaDashboard() {
             </div>
             <div>
               <div className="text-3xl font-extrabold text-navy-800 font-[family-name:var(--font-heading)]">{stat.value}</div>
-              <div className="text-sm font-medium text-gray-500 mt-1">{stat.label}</div>
+              <div className="text-sm font-medium text-slate-600 mt-1">{stat.label}</div>
             </div>
           </div>
         ))}
@@ -67,9 +67,9 @@ export default function MahasiswaDashboard() {
 
             {activeLoans.length === 0 ? (
               <div className="text-center py-12 px-4 border-2 border-dashed border-gray-100 rounded-xl">
-                <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <Package className="w-12 h-12 text-slate-400 mx-auto mb-3" />
                 <h3 className="text-navy-800 font-bold mb-1">Tidak ada peminjaman aktif</h3>
-                <p className="text-sm text-gray-500 mb-4">Anda belum meminjam alat apapun saat ini.</p>
+                <p className="text-sm text-slate-600 mb-4">Anda belum meminjam alat apapun saat ini.</p>
                 <Link href="/mahasiswa/inventaris" className="inline-flex px-4 py-2 rounded-lg bg-navy-800 text-white text-sm font-medium hover:bg-navy-700 transition-colors">
                   Cari Alat
                 </Link>
@@ -84,7 +84,7 @@ export default function MahasiswaDashboard() {
                       </div>
                       <div>
                         <div className="font-bold text-navy-800">{loan.equipmentName}</div>
-                        <div className="text-xs text-gray-500 flex items-center gap-2 mt-1">
+                        <div className="text-xs text-slate-600 flex items-center gap-2 mt-1">
                           <span>{loan.quantity} Unit</span>
                           <span className="w-1 h-1 rounded-full bg-gray-300" />
                           <span>{loan.labName}</span>
@@ -93,7 +93,7 @@ export default function MahasiswaDashboard() {
                     </div>
                     
                     <div className="flex items-center justify-between w-full sm:w-auto gap-4">
-                      <div className="text-sm text-gray-500 flex items-center gap-1.5">
+                      <div className="text-sm text-slate-600 flex items-center gap-1.5">
                         <Calendar className="w-4 h-4" />
                         {new Date(loan.returnDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
                       </div>

@@ -123,7 +123,7 @@ export default function MonitoringPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 animate-fade-in-up">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-800 font-[family-name:var(--font-heading)]">Monitoring & Laporan</h1>
-          <p className="text-gray-500 mt-1">Lacak seluruh aktivitas peminjaman dan export laporan data.</p>
+          <p className="text-slate-600 mt-1">Lacak seluruh aktivitas peminjaman dan export laporan data.</p>
         </div>
         <div className="flex items-center gap-3">
           <button 
@@ -161,7 +161,7 @@ export default function MonitoringPage() {
             </div>
             <div>
               <div className="text-2xl font-extrabold text-navy-800 font-[family-name:var(--font-heading)]">{stat.value}</div>
-              <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mt-0.5">{stat.label}</div>
+              <div className="text-xs font-medium text-slate-600 uppercase tracking-wider mt-0.5">{stat.label}</div>
             </div>
           </div>
         ))}
@@ -169,7 +169,7 @@ export default function MonitoringPage() {
 
       <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm mb-6 animate-fade-in-up stagger-2">
         <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
           <input 
             type="text" 
             placeholder="Cari berdasarkan nama, alat, lab, atau status..." 
@@ -194,15 +194,15 @@ export default function MonitoringPage() {
             <tbody className="divide-y divide-gray-100">
               {isLoading ? (
                 <tr>
-                  <td colSpan={4} className="py-12 text-center text-gray-500">
+                  <td colSpan={4} className="py-12 text-center text-slate-600">
                     <div className="w-8 h-8 border-4 border-accent-cyan border-t-transparent rounded-full animate-spin mx-auto mb-3" />
                     Memuat data peminjaman...
                   </td>
                 </tr>
               ) : filteredLoans.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="py-12 text-center text-gray-500">
-                    <Search className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <td colSpan={4} className="py-12 text-center text-slate-600">
+                    <Search className="w-12 h-12 text-slate-400 mx-auto mb-3" />
                     Tidak ada data yang cocok dengan pencarian
                   </td>
                 </tr>
@@ -210,19 +210,19 @@ export default function MonitoringPage() {
                 filteredLoans.map((loan) => (
                   <tr key={loan.id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="py-4 px-6">
-                      <div className="font-mono text-xs font-bold text-gray-500 mb-1">{loan.id.toUpperCase()}</div>
+                      <div className="font-mono text-xs font-bold text-slate-600 mb-1">{loan.id.toUpperCase()}</div>
                       <div className="flex items-center gap-1.5 text-sm text-navy-800 font-medium whitespace-nowrap">
-                        <CalendarIcon className="w-3.5 h-3.5 text-gray-400" />
+                        <CalendarIcon className="w-3.5 h-3.5 text-slate-500" />
                         {format(new Date(loan.createdAt), 'dd MMM yy', { locale: id })}
                       </div>
                     </td>
                     <td className="py-4 px-6">
                       <div className="font-bold text-navy-800">{loan.userName}</div>
-                      <div className="text-xs text-gray-500">{loan.userNim} - {loan.userKelas}</div>
+                      <div className="text-xs text-slate-600">{loan.userNim} - {loan.userKelas}</div>
                     </td>
                     <td className="py-4 px-6">
                       <div className="font-bold text-navy-800">{loan.equipmentName}</div>
-                      <div className="text-xs text-gray-500">{loan.quantity} Unit • {loan.labName}</div>
+                      <div className="text-xs text-slate-600">{loan.quantity} Unit • {loan.labName}</div>
                     </td>
                     <td className="py-4 px-6">
                       <span className={`badge ${

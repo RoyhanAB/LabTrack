@@ -3,11 +3,12 @@ import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import {
-  FlaskConical, Menu, X, LogOut, Bell,
+  Menu, X, LogOut, Bell,
   LayoutDashboard, PackageSearch, ClipboardList,
   History, Activity, FileText, Check
 } from 'lucide-react';
 import { useStore } from '@/lib/store';
+import { Logo } from '@/components/landing/shared';
 
 type DashboardRole = 'mahasiswa' | 'admin' | 'asisten' | 'super_admin';
 
@@ -101,10 +102,7 @@ export default function DashboardLayout({ children, role }: { children: React.Re
       <aside className="hidden lg:flex w-64 flex-col bg-navy-900 text-white fixed inset-y-0 z-40 border-r border-white/10">
         <div className="h-20 flex items-center px-6 border-b border-white/10">
           <Link href={dashboardHome} className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-cyan to-navy-600 flex items-center justify-center">
-              <FlaskConical className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-xl font-bold font-[family-name:var(--font-heading)]">Lab<span className="text-accent-cyan">Track</span></span>
+            <Logo size="sm" />
           </Link>
         </div>
 
@@ -138,10 +136,7 @@ export default function DashboardLayout({ children, role }: { children: React.Re
       <aside className={`fixed inset-y-0 left-0 w-64 bg-navy-900 text-white z-50 transform transition-transform duration-300 lg:hidden flex flex-col border-r border-white/10 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="h-16 flex items-center justify-between px-4 border-b border-white/10">
           <Link href={dashboardHome} className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-accent-cyan flex items-center justify-center">
-              <FlaskConical className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-xl font-bold font-[family-name:var(--font-heading)]">LabTrack</span>
+            <Logo size="sm" />
           </Link>
           <button onClick={() => setSidebarOpen(false)} className="p-2 text-white/60 hover:text-white">
             <X className="w-5 h-5" />
@@ -183,7 +178,7 @@ export default function DashboardLayout({ children, role }: { children: React.Re
             <div className="relative notification-dropdown">
               <button
                 onClick={() => setNotifOpen(!notifOpen)}
-                className="relative p-2 rounded-full text-gray-500 hover:bg-white hover:text-navy-800 transition-colors"
+                className="relative p-2 rounded-full text-slate-600 hover:bg-white hover:text-navy-800 transition-colors"
               >
                 <Bell className="w-5 h-5" />
                 {unreadNotifs > 0 && (
@@ -210,8 +205,8 @@ export default function DashboardLayout({ children, role }: { children: React.Re
 
                   <div className="max-h-80 overflow-y-auto">
                     {userNotifications.length === 0 ? (
-                      <div className="p-6 text-center text-gray-500">
-                        <Bell className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                      <div className="p-6 text-center text-slate-600">
+                        <Bell className="w-8 h-8 text-slate-400 mx-auto mb-2" />
                         <p className="text-sm">Tidak ada notifikasi</p>
                       </div>
                     ) : (
@@ -225,7 +220,7 @@ export default function DashboardLayout({ children, role }: { children: React.Re
                             <div className="flex-1 min-w-0">
                               <h4 className="font-medium text-navy-800 text-sm">{notif.title}</h4>
                               <p className="text-xs text-gray-600 mt-1 leading-relaxed">{notif.message}</p>
-                              <p className="text-xs text-gray-400 mt-2">
+                              <p className="text-xs text-slate-500 mt-2">
                                 {new Date(notif.createdAt).toLocaleString('id-ID', {
                                   day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
                                 })}
@@ -234,7 +229,7 @@ export default function DashboardLayout({ children, role }: { children: React.Re
                             {!notif.read && (
                               <button
                                 onClick={() => handleMarkAsRead(notif.id)}
-                                className="p-1 rounded text-gray-400 hover:text-accent-cyan transition-colors"
+                                className="p-1 rounded text-slate-500 hover:text-accent-cyan transition-colors"
                               >
                                 <Check className="w-4 h-4" />
                               </button>
@@ -251,7 +246,7 @@ export default function DashboardLayout({ children, role }: { children: React.Re
             <div className="flex items-center gap-3">
               <div className="hidden sm:block text-right">
                 <div className="text-sm font-bold text-navy-800">{currentUser.name}</div>
-                <div className="text-xs text-gray-500 capitalize">{currentUser.role} {currentUser.kelas ? `- ${currentUser.kelas}` : ''}</div>
+                <div className="text-xs text-slate-600 capitalize">{currentUser.role} {currentUser.kelas ? `- ${currentUser.kelas}` : ''}</div>
               </div>
               <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-accent-cyan to-navy-600 flex items-center justify-center text-white font-bold shadow-md">
                 {currentUser.name.charAt(0)}

@@ -9,7 +9,11 @@ import { validateNIMTeknikIndustri, validatePasswordStrength } from '@/lib/auth'
 import { Logo, PulseDot, DISPLAY, BODY, MONO } from '@/components/landing/shared';
 import toast from 'react-hot-toast';
 
-const gridBg = { backgroundColor:'#060D1A', backgroundImage:'linear-gradient(rgba(0,201,173,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,201,173,0.04) 1px,transparent 1px)', backgroundSize:'48px 48px' };
+const gridBg = {
+  backgroundColor: '#087EA4',
+  backgroundImage: 'linear-gradient(rgba(255,255,255,0.055) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.045) 1px,transparent 1px),linear-gradient(180deg,#064B7A 0%,#0A90A9 100%)',
+  backgroundSize: '48px 48px,48px 48px,auto'
+};
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -138,7 +142,7 @@ export default function RegisterPage() {
     }
   };
 
-  const sColor = passwordStrength?.strength==='strong'?'bg-teal-400':passwordStrength?.strength==='medium'?'bg-amber-400':'bg-red-400';
+  const sColor = passwordStrength?.strength==='strong'?'bg-[#35C7E6]':passwordStrength?.strength==='medium'?'bg-amber-400':'bg-red-400';
   const sWidth = passwordStrength?.strength==='strong'?'w-full':passwordStrength?.strength==='medium'?'w-2/3':'w-1/3';
   const sLabel = passwordStrength?.strength==='strong'?'Kuat':passwordStrength?.strength==='medium'?'Sedang':'Lemah';
 
@@ -146,23 +150,22 @@ export default function RegisterPage() {
     <div className="min-h-screen flex">
       {/* Left Dark Panel */}
       <div className="hidden lg:flex flex-col justify-between w-[46%] xl:w-[42%] p-12 relative overflow-hidden" style={gridBg}>
-        <div className="absolute inset-0 pointer-events-none" style={{background:'radial-gradient(ellipse 75% 75% at 25% 65%,rgba(0,201,173,0.09) 0%,transparent 65%)'}}/>
-        <motion.div className="absolute left-0 right-0 h-px" style={{background:'linear-gradient(90deg,transparent,rgba(0,201,173,0.4),transparent)'}} animate={{top:['5%','95%']}} transition={{duration:7,repeat:Infinity,ease:'linear',repeatType:'reverse'}}/>
+        <div className="absolute inset-0 pointer-events-none" style={{background:'radial-gradient(ellipse 75% 75% at 25% 65%,rgba(14,165,198,0.09) 0%,transparent 65%)'}}/>
         <div className="relative"><Logo/></div>
         <div className="relative">
-          <div className="flex items-center gap-2 mb-6"><PulseDot/><span className="text-teal-400 text-[11px] tracking-[0.18em] uppercase" style={{fontFamily:MONO}}>REGISTRASI MAHASISWA</span></div>
-          <h2 className="text-[44px] xl:text-[52px] font-black text-white leading-[0.9] mb-5 tracking-tight" style={{fontFamily:DISPLAY}}>DAFTAR SEBAGAI<br/>MAHASISWA<br/><span className="text-teal-400">TEKNIK INDUSTRI</span></h2>
-          <p className="text-slate-400 max-w-[340px] text-sm leading-relaxed mb-10" style={{fontFamily:BODY}}>Khusus untuk mahasiswa Teknik Industri UNTIRTA dengan NIM format 3333YYXXXX.</p>
+          <div className="flex items-center gap-2 mb-6"><PulseDot/><span className="text-[#F7FDFF] text-[11px] tracking-[0.18em] uppercase" style={{fontFamily:MONO}}>REGISTRASI MAHASISWA</span></div>
+          <h2 className="text-[44px] xl:text-[52px] font-black text-white leading-[0.9] mb-5 tracking-tight" style={{fontFamily:DISPLAY}}>DAFTAR SEBAGAI<br/>MAHASISWA<br/><span className="text-[#F7FDFF]">TEKNIK INDUSTRI</span></h2>
+          <p className="text-[#D8F6FB]/90 max-w-[340px] text-sm leading-relaxed mb-10" style={{fontFamily:BODY}}>Khusus untuk mahasiswa Teknik Industri UNTIRTA dengan NIM format 3333YYXXXX.</p>
           <div className="space-y-3">
             {[{icon:GraduationCap,title:'Email NIM@untirta.ac.id',desc:'Email otomatis dari NIM Anda'},{icon:Users,title:'NIM Teknik Industri',desc:'Format: 3333YYXXXX (contoh: 3333230001)'}].map(({icon:Icon,title,desc})=>(
               <div key={title} className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center flex-shrink-0 mt-0.5"><Icon className="w-4 h-4 text-teal-400"/></div>
-                <div><div className="text-white font-semibold text-sm mb-0.5">{title}</div><div className="text-slate-600 text-[12px]" style={{fontFamily:MONO}}>{desc}</div></div>
+                <div className="w-8 h-8 rounded-lg bg-[#0EA5C6]/10 border border-[#0EA5C6]/20 flex items-center justify-center flex-shrink-0 mt-0.5"><Icon className="w-4 h-4 text-[#F7FDFF]"/></div>
+                <div><div className="text-white font-semibold text-sm mb-0.5">{title}</div><div className="text-[#BCEFF7]/75 text-[12px]" style={{fontFamily:MONO}}>{desc}</div></div>
               </div>
             ))}
           </div>
         </div>
-        <p className="relative text-slate-700 text-[11px]" style={{fontFamily:MONO}}>© 2026 LabTrack · UNTIRTA Teknik Industri</p>
+        <p className="relative text-[#BCEFF7]/60 text-[11px]" style={{fontFamily:MONO}}>© 2026 LabTrack · UNTIRTA Teknik Industri</p>
       </div>
 
       {/* Right Form */}
@@ -180,7 +183,7 @@ export default function RegisterPage() {
               <label className="text-sm font-medium text-slate-700 block mb-1.5" style={{fontFamily:BODY}}>Nama Lengkap</label>
               <div className="relative">
                 <User className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"/>
-                <input type="text" value={formData.name} onChange={e=>handleChange('name',e.target.value)} placeholder="Masukkan nama lengkap" className={`w-full pl-11 pr-4 py-3 rounded-xl border ${errors.name?'border-red-300':'border-slate-200'} bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-400 transition-all`} style={{fontFamily:BODY}}/>
+                <input type="text" value={formData.name} onChange={e=>handleChange('name',e.target.value)} placeholder="Masukkan nama lengkap" className={`w-full pl-11 pr-4 py-3 rounded-xl border ${errors.name?'border-red-300':'border-slate-200'} bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5C6]/25 focus:border-[#0EA5C6] transition-all`} style={{fontFamily:BODY}}/>
               </div>
               {errors.name && <p className="text-xs text-red-600 mt-1">{errors.name}</p>}
             </div>
@@ -190,13 +193,13 @@ export default function RegisterPage() {
               <label className="text-sm font-medium text-slate-700 block mb-1.5" style={{fontFamily:BODY}}>NIM</label>
               <div className="relative">
                 <Hash className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"/>
-                <input type="text" value={formData.nim} onChange={e=>handleNIMChange(e.target.value)} placeholder="3333YYXXXX" className={`w-full pl-11 pr-4 py-3 rounded-xl border ${errors.nim?'border-red-300':'border-slate-200'} bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-400 transition-all`} style={{fontFamily:MONO}}/>
+                <input type="text" value={formData.nim} onChange={e=>handleNIMChange(e.target.value)} placeholder="3333YYXXXX" className={`w-full pl-11 pr-4 py-3 rounded-xl border ${errors.nim?'border-red-300':'border-slate-200'} bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5C6]/25 focus:border-[#0EA5C6] transition-all`} style={{fontFamily:MONO}}/>
               </div>
               {errors.nim && <p className="text-xs text-red-600 mt-1">{errors.nim}</p>}
               {nimInfo && (
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {[nimInfo.fakultas,nimInfo.prodi,nimInfo.angkatan,nimInfo.nomorUrut].filter(Boolean).map((item,i)=>(
-                    <span key={i} className={`inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full font-medium ${item!.valid?'bg-teal-50 text-teal-600':'bg-red-50 text-red-500'}`} style={{fontFamily:MONO}}>
+                    <span key={i} className={`inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full font-medium ${item!.valid?'bg-[#E8F8FC] text-[#087EA4]':'bg-red-50 text-red-500'}`} style={{fontFamily:MONO}}>
                       {item!.valid?<CheckCircle2 className="w-3 h-3"/>:<XCircle className="w-3 h-3"/>}{item!.label} ({item!.code})
                     </span>
                   ))}
@@ -210,17 +213,17 @@ export default function RegisterPage() {
               <div className="relative">
                 <Mail className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"/>
                 <div className={`w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm ${formData.nim.length===10?'text-slate-900':'text-slate-400'}`} style={{fontFamily:MONO}}>
-                  {generatedEmail?<span>{formData.nim}<span className="text-teal-500 font-semibold">@untirta.ac.id</span></span>:'Isi NIM untuk generate email'}
+                  {generatedEmail?<span>{formData.nim}<span className="text-[#087EA4] font-semibold">@untirta.ac.id</span></span>:'Isi NIM untuk generate email'}
                 </div>
               </div>
-              {generatedEmail && <p className="text-xs text-teal-600 mt-1 flex items-center gap-1"><CheckCircle2 className="w-3 h-3"/>Email akan digunakan untuk login dan menerima kode verifikasi</p>}
+              {generatedEmail && <p className="text-xs text-[#087EA4] mt-1 flex items-center gap-1"><CheckCircle2 className="w-3 h-3"/>Email akan digunakan untuk login dan menerima kode verifikasi</p>}
             </div>
 
             {codeSent && (
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="text-sm font-medium text-slate-700 block" style={{fontFamily:BODY}}>Kode Verifikasi Email</label>
-                  <button type="button" onClick={sendVerificationCode} disabled={loading} className="text-xs font-semibold text-teal-500 hover:text-teal-600 disabled:opacity-60" style={{fontFamily:BODY}}>Kirim ulang</button>
+                  <button type="button" onClick={sendVerificationCode} disabled={loading} className="text-xs font-semibold text-[#087EA4] hover:text-[#087EA4] disabled:opacity-60" style={{fontFamily:BODY}}>Kirim ulang</button>
                 </div>
                 <div className="relative">
                   <KeyRound className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"/>
@@ -234,7 +237,7 @@ export default function RegisterPage() {
                       if (errors.verificationCode) setErrors(prev => { const n={...prev}; delete n.verificationCode; return n; });
                     }}
                     placeholder="Masukkan 6 digit kode"
-                    className={`w-full pl-11 pr-4 py-3 rounded-xl border ${errors.verificationCode?'border-red-300':'border-slate-200'} bg-white text-slate-900 text-sm tracking-[0.35em] focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-400 transition-all`}
+                    className={`w-full pl-11 pr-4 py-3 rounded-xl border ${errors.verificationCode?'border-red-300':'border-slate-200'} bg-white text-slate-900 text-sm tracking-[0.35em] focus:outline-none focus:ring-2 focus:ring-[#0EA5C6]/25 focus:border-[#0EA5C6] transition-all`}
                     style={{fontFamily:MONO}}
                   />
                 </div>
@@ -248,7 +251,7 @@ export default function RegisterPage() {
             {kelasOptions && (
               <div>
                 <label className="text-sm font-medium text-slate-700 block mb-1.5" style={{fontFamily:BODY}}>Kelas</label>
-                <select value={formData.kelas} onChange={e=>handleChange('kelas',e.target.value)} className={`w-full px-4 py-3 rounded-xl border ${errors.kelas?'border-red-300':'border-slate-200'} bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-400 transition-all`} style={{fontFamily:BODY}}>
+                <select value={formData.kelas} onChange={e=>handleChange('kelas',e.target.value)} className={`w-full px-4 py-3 rounded-xl border ${errors.kelas?'border-red-300':'border-slate-200'} bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5C6]/25 focus:border-[#0EA5C6] transition-all`} style={{fontFamily:BODY}}>
                   <option value="">Pilih kelas...</option>
                   {kelasOptions.filter(Boolean).map(k=><option key={k} value={k}>{k}</option>)}
                 </select>
@@ -261,13 +264,13 @@ export default function RegisterPage() {
               <label className="text-sm font-medium text-slate-700 block mb-1.5" style={{fontFamily:BODY}}>Password</label>
               <div className="relative">
                 <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"/>
-                <input type={showPassword?'text':'password'} value={formData.password} onChange={e=>handleChange('password',e.target.value)} placeholder="Minimal 8 karakter" className={`w-full pl-11 pr-11 py-3 rounded-xl border ${errors.password?'border-red-300':'border-slate-200'} bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-400 transition-all`} style={{fontFamily:BODY}}/>
+                <input type={showPassword?'text':'password'} value={formData.password} onChange={e=>handleChange('password',e.target.value)} placeholder="Minimal 8 karakter" className={`w-full pl-11 pr-11 py-3 rounded-xl border ${errors.password?'border-red-300':'border-slate-200'} bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5C6]/25 focus:border-[#0EA5C6] transition-all`} style={{fontFamily:BODY}}/>
                 <button type="button" onClick={()=>setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">{showPassword?<EyeOff className="w-4 h-4"/>:<Eye className="w-4 h-4"/>}</button>
               </div>
               {errors.password && <p className="text-xs text-red-600 mt-1">{errors.password}</p>}
               {passwordStrength && (
                 <div className="mt-2">
-                  <div className="flex justify-between text-[11px] mb-1"><span className="text-slate-500" style={{fontFamily:MONO}}>Kekuatan Password</span><span className={passwordStrength.strength==='strong'?'text-teal-500':passwordStrength.strength==='medium'?'text-amber-500':'text-red-400'} style={{fontFamily:MONO}}>{sLabel}</span></div>
+                  <div className="flex justify-between text-[11px] mb-1"><span className="text-slate-500" style={{fontFamily:MONO}}>Kekuatan Password</span><span className={passwordStrength.strength==='strong'?'text-[#087EA4]':passwordStrength.strength==='medium'?'text-amber-500':'text-red-400'} style={{fontFamily:MONO}}>{sLabel}</span></div>
                   <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden"><div className={`h-full rounded-full transition-all duration-300 ${sColor} ${sWidth}`}/></div>
                 </div>
               )}
@@ -278,22 +281,22 @@ export default function RegisterPage() {
               <label className="text-sm font-medium text-slate-700 block mb-1.5" style={{fontFamily:BODY}}>Konfirmasi Password</label>
               <div className="relative">
                 <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"/>
-                <input type={showConfirmPassword?'text':'password'} value={formData.confirmPassword} onChange={e=>handleChange('confirmPassword',e.target.value)} placeholder="Ulangi password" className={`w-full pl-11 pr-11 py-3 rounded-xl border ${errors.confirmPassword?'border-red-300':passwordMatch===true?'border-teal-400':passwordMatch===false?'border-red-300':'border-slate-200'} bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-400 transition-all`} style={{fontFamily:BODY}}/>
+                <input type={showConfirmPassword?'text':'password'} value={formData.confirmPassword} onChange={e=>handleChange('confirmPassword',e.target.value)} placeholder="Ulangi password" className={`w-full pl-11 pr-11 py-3 rounded-xl border ${errors.confirmPassword?'border-red-300':passwordMatch===true?'border-[#0EA5C6]':passwordMatch===false?'border-red-300':'border-slate-200'} bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5C6]/25 focus:border-[#0EA5C6] transition-all`} style={{fontFamily:BODY}}/>
                 <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
-                  {passwordMatch!==null && (passwordMatch?<CheckCircle2 className="w-4 h-4 text-teal-500"/>:<XCircle className="w-4 h-4 text-red-400"/>)}
+                  {passwordMatch!==null && (passwordMatch?<CheckCircle2 className="w-4 h-4 text-[#087EA4]"/>:<XCircle className="w-4 h-4 text-red-400"/>)}
                   <button type="button" onClick={()=>setShowConfirmPassword(!showConfirmPassword)} className="text-slate-400 hover:text-slate-600">{showConfirmPassword?<EyeOff className="w-4 h-4"/>:<Eye className="w-4 h-4"/>}</button>
                 </div>
               </div>
               {errors.confirmPassword && <p className="text-xs text-red-600 mt-1">{errors.confirmPassword}</p>}
-              {passwordMatch===true && <p className="text-xs text-teal-600 mt-1 flex items-center gap-1"><CheckCircle2 className="w-3 h-3"/>Password cocok ✓</p>}
+              {passwordMatch===true && <p className="text-xs text-[#087EA4] mt-1 flex items-center gap-1"><CheckCircle2 className="w-3 h-3"/>Password cocok ✓</p>}
             </div>
 
-            <motion.button type="submit" disabled={loading} whileTap={{scale:0.98}} className="w-full py-3.5 rounded-xl bg-[#060D1A] hover:bg-[#0C1829] text-white font-semibold text-sm flex items-center justify-center gap-2.5 transition-all hover:shadow-lg disabled:opacity-60 mt-2" style={{fontFamily:BODY}}>
+            <motion.button type="submit" disabled={loading} whileTap={{scale:0.98}} className="w-full py-3.5 rounded-xl bg-[#063B62] hover:bg-[#074B73] text-white font-semibold text-sm flex items-center justify-center gap-2.5 transition-all hover:shadow-lg disabled:opacity-60 mt-2" style={{fontFamily:BODY}}>
               {loading?<span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"/>:<>{codeSent ? 'Verifikasi & Daftar' : 'Kirim Kode Verifikasi'} <ArrowRight className="w-4 h-4"/></>}
             </motion.button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-slate-500" style={{fontFamily:BODY}}>Sudah punya akun?{' '}<Link href="/login" className="text-teal-500 hover:text-teal-600 font-semibold transition-colors">Login</Link></p>
+          <p className="mt-6 text-center text-sm text-slate-500" style={{fontFamily:BODY}}>Sudah punya akun?{' '}<Link href="/login" className="text-[#087EA4] hover:text-[#087EA4] font-semibold transition-colors">Login</Link></p>
         </div>
       </div>
     </div>

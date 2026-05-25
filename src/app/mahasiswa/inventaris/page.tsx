@@ -28,7 +28,7 @@ export default function InventarisPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 animate-fade-in-up">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-800 font-[family-name:var(--font-heading)]">Inventaris Alat</h1>
-          <p className="text-gray-500 mt-1">Cari dan pilih alat laboratorium yang ingin Anda pinjam.</p>
+          <p className="text-slate-600 mt-1">Cari dan pilih alat laboratorium yang ingin Anda pinjam.</p>
         </div>
       </div>
 
@@ -36,7 +36,7 @@ export default function InventarisPage() {
       <div className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-100 shadow-sm mb-8 animate-fade-in-up stagger-2">
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
             <input 
               type="text" 
               placeholder="Cari nama alat atau kategori..." 
@@ -78,15 +78,15 @@ export default function InventarisPage() {
       {isLoading ? (
         <div className="bg-white rounded-2xl p-12 border border-gray-100 shadow-sm text-center animate-fade-in-up stagger-3 flex flex-col items-center justify-center">
           <div className="w-8 h-8 border-4 border-accent-cyan border-t-transparent rounded-full animate-spin mb-4" />
-          <p className="text-gray-500 font-medium">Memuat data alat...</p>
+          <p className="text-slate-600 font-medium">Memuat data alat...</p>
         </div>
       ) : filteredEquipment.length === 0 ? (
         <div className="bg-white rounded-2xl p-12 border border-gray-100 shadow-sm text-center animate-fade-in-up stagger-3">
           <div className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
-            <Search className="w-8 h-8 text-gray-400" />
+            <Search className="w-8 h-8 text-slate-500" />
           </div>
           <h3 className="text-xl font-bold text-navy-800 mb-2">Alat tidak ditemukan</h3>
-          <p className="text-gray-500">Coba ubah kata kunci pencarian atau filter Anda.</p>
+          <p className="text-slate-600">Coba ubah kata kunci pencarian atau filter Anda.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 xl:gap-6 gap-4 animate-fade-in-up stagger-3">
@@ -124,13 +124,13 @@ export default function InventarisPage() {
                   <div className="text-xs font-medium text-accent-cyan bg-cyan-50 px-2.5 py-1 rounded-md self-start mb-3">
                     {eq.category}
                   </div>
-                  <p className="text-sm text-gray-500 line-clamp-2 mb-4 flex-1">
+                  <p className="text-sm text-slate-600 line-clamp-2 mb-4 flex-1">
                     {eq.description}
                   </p>
                   
                   <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
                     <div className="flex flex-col">
-                      <span className="text-xs text-gray-500 mb-0.5">Stok Tersedia</span>
+                      <span className="text-xs text-slate-600 mb-0.5">Stok Tersedia</span>
                       <span className="font-bold text-navy-800">{eq.availableStock} / {eq.totalStock} Unit</span>
                     </div>
                     <Link 

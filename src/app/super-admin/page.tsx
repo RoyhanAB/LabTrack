@@ -209,7 +209,7 @@ export default function SuperAdminPage() {
           <h1 className="text-3xl font-extrabold text-navy-800 font-[family-name:var(--font-heading)]">
             Super Admin Dashboard
           </h1>
-          <p className="text-gray-500 mt-1">Kelola semua user dan admin sistem</p>
+          <p className="text-slate-600 mt-1">Kelola semua user dan admin sistem</p>
         </div>
 
         {/* Stats */}
@@ -222,7 +222,7 @@ export default function SuperAdminPage() {
                 </div>
               </div>
               <div className="text-3xl font-extrabold text-navy-800 mb-1">{stat.value}</div>
-              <div className="text-sm text-gray-500">{stat.label}</div>
+              <div className="text-sm text-slate-600">{stat.label}</div>
             </div>
           ))}
         </div>
@@ -232,7 +232,7 @@ export default function SuperAdminPage() {
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <div className="flex-1 w-full sm:w-auto">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                 <input
                   type="text"
                   placeholder="Cari nama, email, atau NIM..."
@@ -298,8 +298,8 @@ export default function SuperAdminPage() {
                     <td className="px-6 py-4">
                       <div className="text-sm text-gray-600">
                         {user.nim && <div>NIM: {user.nim}</div>}
-                        {user.kelas && <div className="text-xs text-gray-400">{user.kelas}</div>}
-                        {!user.nim && !user.kelas && <span className="text-gray-400">-</span>}
+                        {user.kelas && <div className="text-xs text-slate-500">{user.kelas}</div>}
+                        {!user.nim && !user.kelas && <span className="text-slate-500">-</span>}
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -328,8 +328,8 @@ export default function SuperAdminPage() {
 
             {filteredUsers.length === 0 && (
               <div className="text-center py-12">
-                <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-500">Tidak ada user ditemukan</p>
+                <Users className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+                <p className="text-slate-600">Tidak ada user ditemukan</p>
               </div>
             )}
           </div>

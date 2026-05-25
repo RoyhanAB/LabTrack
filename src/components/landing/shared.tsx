@@ -24,13 +24,13 @@ export function useCountUp(to: number, duration = 1600) {
 export function PulseDot({ active = true }: { active?: boolean }) {
   return (
     <span className="relative flex h-2 w-2 flex-shrink-0">
-      {active && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75" />}
-      <span className={`relative inline-flex rounded-full h-2 w-2 ${active ? "bg-teal-400" : "bg-slate-600"}`} />
+      {active && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0EA5C6] opacity-75" />}
+      <span className={`relative inline-flex rounded-full h-2 w-2 ${active ? "bg-[#0EA5C6]" : "bg-slate-600"}`} />
     </span>
   );
 }
 
-export function Brackets({ c = "border-teal-500/30" }: { c?: string }) {
+export function Brackets({ c = "border-[#0EA5C6]/30" }: { c?: string }) {
   const b = `absolute w-3 h-3 border-[1.5px] ${c}`;
   return (
     <>
@@ -43,16 +43,16 @@ export function Brackets({ c = "border-teal-500/30" }: { c?: string }) {
 }
 
 export function Logo({ size = "md" }: { size?: "sm" | "md" }) {
-  const box = size === "sm" ? "w-6 h-6" : "w-8 h-8";
-  const ico = size === "sm" ? "w-3 h-3" : "w-4 h-4";
-  const txt = size === "sm" ? "text-base" : "text-lg";
+  const box = size === "sm" ? "w-7 h-7" : "w-9 h-9";
+  const ico = size === "sm" ? "w-3.5 h-3.5" : "w-[18px] h-[18px]";
+  const txt = size === "sm" ? "text-lg" : "text-2xl";
   return (
     <div className="flex items-center gap-2.5">
-      <div className={`${box} rounded bg-teal-500/10 border border-teal-500/30 flex items-center justify-center`}>
-        <CircuitBoard className={`${ico} text-teal-400`} />
+      <div className={`${box} rounded bg-[#0EA5C6]/10 border border-[#F7FDFF]/40 flex items-center justify-center`}>
+        <CircuitBoard className={`${ico} text-[#F7FDFF]`} />
       </div>
       <span className={`${txt} font-black tracking-tight`} style={{ fontFamily: DISPLAY }}>
-        <span className="text-teal-400">Lab</span>
+        <span className="text-[#F7FDFF]">Lab</span>
         <span className="text-white">Track</span>
       </span>
     </div>

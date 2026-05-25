@@ -93,13 +93,13 @@ export default function PengembalianPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 animate-fade-in-up">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-800 font-[family-name:var(--font-heading)]">Pengembalian Alat</h1>
-          <p className="text-gray-500 mt-1">Proses pengembalian alat dan catat kondisi alat setelah dipinjam.</p>
+          <p className="text-slate-600 mt-1">Proses pengembalian alat dan catat kondisi alat setelah dipinjam.</p>
         </div>
       </div>
 
       <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm mb-6 animate-fade-in-up stagger-2">
         <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
           <input 
             type="text" 
             placeholder="Cari ID peminjaman, nama alat, atau nama mahasiswa..." 
@@ -125,15 +125,15 @@ export default function PengembalianPage() {
             <tbody className="divide-y divide-gray-100">
               {isLoading ? (
                 <tr>
-                  <td colSpan={5} className="py-12 text-center text-gray-500">
+                  <td colSpan={5} className="py-12 text-center text-slate-600">
                     <div className="w-8 h-8 border-4 border-accent-cyan border-t-transparent rounded-full animate-spin mx-auto mb-3" />
                     Memuat data peminjaman...
                   </td>
                 </tr>
               ) : filteredLoans.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-12 text-center text-gray-500">
-                    <History className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <td colSpan={5} className="py-12 text-center text-slate-600">
+                    <History className="w-12 h-12 text-slate-400 mx-auto mb-3" />
                     Tidak ada peminjaman aktif yang cocok dengan pencarian
                   </td>
                 </tr>
@@ -147,15 +147,15 @@ export default function PengembalianPage() {
                       </td>
                       <td className="py-4 px-6">
                         <div className="font-bold text-navy-800">{loan.userName}</div>
-                        <div className="text-xs text-gray-500">{loan.userKelas}</div>
+                        <div className="text-xs text-slate-600">{loan.userKelas}</div>
                       </td>
                       <td className="py-4 px-6">
                         <div className="font-bold text-navy-800">{loan.equipmentName}</div>
-                        <div className="text-xs text-gray-500">{loan.quantity} Unit • {loan.labName}</div>
+                        <div className="text-xs text-slate-600">{loan.quantity} Unit • {loan.labName}</div>
                       </td>
                       <td className="py-4 px-6">
                         <div className={`flex items-center gap-1.5 text-sm font-medium whitespace-nowrap ${isLate ? 'text-danger' : 'text-navy-800'}`}>
-                          <Calendar className={`w-4 h-4 ${isLate ? 'text-danger' : 'text-gray-400'}`} />
+                          <Calendar className={`w-4 h-4 ${isLate ? 'text-danger' : 'text-slate-500'}`} />
                           {format(new Date(loan.returnDate), 'dd MMM yyyy', { locale: id })}
                         </div>
                         {isLate && <div className="text-xs font-bold text-danger mt-1">Terlambat</div>}
@@ -186,7 +186,7 @@ export default function PengembalianPage() {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-scale-in">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <h3 className="text-lg font-bold text-navy-800 font-[family-name:var(--font-heading)]">Konfirmasi Pengembalian</h3>
-              <button onClick={() => { setShowReturnModal(false); setReturnTarget(null); }} className="p-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
+              <button onClick={() => { setShowReturnModal(false); setReturnTarget(null); }} className="p-2 rounded-lg text-slate-500 hover:bg-gray-100 hover:text-gray-600 transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>

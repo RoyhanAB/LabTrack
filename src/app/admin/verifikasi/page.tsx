@@ -151,16 +151,16 @@ export default function VerifikasiPage() {
     <DashboardLayout role="admin">
       <div className="mb-8 animate-fade-in-up">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-800 font-[family-name:var(--font-heading)]">Verifikasi Peminjaman</h1>
-        <p className="text-gray-500 mt-1">Tinjau dan setujui pengajuan peminjaman alat laboratorium.</p>
+        <p className="text-slate-600 mt-1">Tinjau dan setujui pengajuan peminjaman alat laboratorium.</p>
       </div>
 
       {pendingLoans.length === 0 ? (
         <div className="bg-white rounded-2xl p-12 border border-gray-100 shadow-sm text-center animate-fade-in-up stagger-2">
           <div className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
-            <ClipboardList className="w-8 h-8 text-gray-300" />
+            <ClipboardList className="w-8 h-8 text-slate-400" />
           </div>
           <h3 className="text-lg font-bold text-navy-800 mb-2">Semua Beres!</h3>
-          <p className="text-gray-500">Tidak ada pengajuan peminjaman baru yang perlu diverifikasi.</p>
+          <p className="text-slate-600">Tidak ada pengajuan peminjaman baru yang perlu diverifikasi.</p>
         </div>
       ) : (
         <div className="grid lg:grid-cols-2 gap-6">
@@ -170,14 +170,14 @@ export default function VerifikasiPage() {
                 <div className="flex justify-between items-start mb-6">
                   <div>
                     <h3 className="text-xl font-bold text-navy-800 mb-1">{loan.equipmentName}</h3>
-                    <div className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                    <div className="text-sm font-medium text-slate-600 flex items-center gap-2">
                       <span>{loan.quantity} Unit</span>
                       <span className="w-1 h-1 rounded-full bg-gray-300" />
                       <span>{loan.labName}</span>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-xs text-gray-400 mb-1">Diajukan pada</div>
+                    <div className="text-xs text-slate-500 mb-1">Diajukan pada</div>
                     <div className="text-sm font-bold text-navy-800">
                       {format(new Date(loan.createdAt), 'dd MMM yyyy, HH:mm', { locale: id })}
                     </div>
@@ -208,7 +208,7 @@ export default function VerifikasiPage() {
 
                 {loan.notes && (
                   <div className="mb-4">
-                    <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Tujuan Peminjaman</div>
+                    <div className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Tujuan Peminjaman</div>
                     <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg border border-gray-100">{loan.notes}</p>
                   </div>
                 )}

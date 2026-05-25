@@ -191,7 +191,7 @@ export default function ManajemenInventarisPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 animate-fade-in-up">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-800 font-[family-name:var(--font-heading)]">Manajemen Inventaris</h1>
-          <p className="text-gray-500 mt-1">Kelola data alat laboratorium (Tambah, Edit, Hapus).</p>
+          <p className="text-slate-600 mt-1">Kelola data alat laboratorium (Tambah, Edit, Hapus).</p>
         </div>
         <button 
           onClick={openAddModal}
@@ -205,7 +205,7 @@ export default function ManajemenInventarisPage() {
       <div className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-100 shadow-sm mb-6 animate-fade-in-up stagger-2">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
             <input 
               type="text" 
               placeholder="Cari alat..." 
@@ -244,15 +244,15 @@ export default function ManajemenInventarisPage() {
             <tbody className="divide-y divide-gray-100">
               {isLoading ? (
                 <tr>
-                  <td colSpan={5} className="py-12 text-center text-gray-500">
+                  <td colSpan={5} className="py-12 text-center text-slate-600">
                     <div className="w-8 h-8 border-4 border-accent-cyan border-t-transparent rounded-full animate-spin mx-auto mb-3" />
                     Memuat data alat...
                   </td>
                 </tr>
               ) : filteredEquipment.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-12 text-center text-gray-500">
-                    <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <td colSpan={5} className="py-12 text-center text-slate-600">
+                    <Package className="w-12 h-12 text-slate-400 mx-auto mb-3" />
                     Tidak ada alat ditemukan
                   </td>
                 </tr>
@@ -263,7 +263,7 @@ export default function ManajemenInventarisPage() {
                     <tr key={eq.id} className="hover:bg-gray-50/50 transition-colors">
                       <td className="py-4 px-6">
                         <div className="font-bold text-navy-800">{eq.name}</div>
-                        <div className="text-xs text-gray-500 mt-1">{eq.category}</div>
+                        <div className="text-xs text-slate-600 mt-1">{eq.category}</div>
                       </td>
                       <td className="py-4 px-6">
                         <span className="px-2.5 py-1 rounded-lg bg-gray-100 text-xs font-bold text-navy-700">
@@ -273,8 +273,8 @@ export default function ManajemenInventarisPage() {
                       <td className="py-4 px-6 text-center">
                         <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-navy-50 border border-navy-100">
                           <span className="font-bold text-navy-800">{eq.availableStock}</span>
-                          <span className="text-gray-400 mx-1">/</span>
-                          <span className="text-gray-500 text-sm">{eq.totalStock}</span>
+                          <span className="text-slate-500 mx-1">/</span>
+                          <span className="text-slate-600 text-sm">{eq.totalStock}</span>
                         </div>
                       </td>
                       <td className="py-4 px-6">
@@ -290,13 +290,13 @@ export default function ManajemenInventarisPage() {
                         <div className="flex items-center justify-end gap-2">
                           <button 
                             onClick={() => openEditModal(eq)}
-                            className="p-2 rounded-lg text-gray-500 hover:bg-blue-50 hover:text-info transition-colors"
+                            className="p-2 rounded-lg text-slate-600 hover:bg-blue-50 hover:text-info transition-colors"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
                           <button 
                             onClick={() => handleDelete(eq.id, eq.name)}
-                            className="p-2 rounded-lg text-gray-500 hover:bg-red-50 hover:text-danger transition-colors"
+                            className="p-2 rounded-lg text-slate-600 hover:bg-red-50 hover:text-danger transition-colors"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -319,7 +319,7 @@ export default function ManajemenInventarisPage() {
               <h2 className="text-xl font-bold text-navy-800 font-[family-name:var(--font-heading)]">
                 {editingEquipment ? 'Edit Alat' : 'Tambah Alat Baru'}
               </h2>
-              <button onClick={() => setShowModal(false)} className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
+              <button onClick={() => setShowModal(false)} className="p-2 rounded-lg text-slate-600 hover:bg-gray-100 transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -459,7 +459,7 @@ export default function ManajemenInventarisPage() {
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent-cyan/30 focus:border-accent-cyan outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-accent-cyan/10 file:text-accent-cyan hover:file:bg-accent-cyan/20 cursor-pointer"
                   />
                   {formData.image && !imageFile && (
-                    <div className="mt-3 text-sm text-gray-500 flex items-center gap-2">
+                    <div className="mt-3 text-sm text-slate-600 flex items-center gap-2">
                       <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />

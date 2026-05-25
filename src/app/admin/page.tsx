@@ -28,7 +28,7 @@ export default function AdminDashboard() {
     <DashboardLayout role="admin">
       <div className="mb-8 animate-fade-in-up">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-800 font-[family-name:var(--font-heading)]">Dashboard Admin</h1>
-        <p className="text-gray-500 mt-1">Ringkasan aktivitas laboratorium dan status inventaris.</p>
+        <p className="text-slate-600 mt-1">Ringkasan aktivitas laboratorium dan status inventaris.</p>
       </div>
 
       {/* Stats Grid */}
@@ -47,7 +47,7 @@ export default function AdminDashboard() {
             </div>
             <div>
               <div className="text-3xl font-extrabold text-navy-800 font-[family-name:var(--font-heading)]">{stat.value}</div>
-              <div className="text-sm font-medium text-gray-500 mt-1">{stat.label}</div>
+              <div className="text-sm font-medium text-slate-600 mt-1">{stat.label}</div>
             </div>
           </div>
         ))}
@@ -74,7 +74,7 @@ export default function AdminDashboard() {
                     <span className="font-bold text-navy-800">{log.userName}</span>{' '}
                     {log.description}
                   </div>
-                  <div className="text-xs font-medium text-gray-400">
+                  <div className="text-xs font-medium text-slate-500">
                     {new Date(log.createdAt).toLocaleString('id-ID', { 
                       day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' 
                     })}

@@ -166,7 +166,7 @@ export default function DetailAlatPage({ params }: { params: Promise<{ id: strin
 
   return (
     <DashboardLayout role="mahasiswa">
-      <Link href="/mahasiswa/inventaris" className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-navy-800 mb-6 transition-colors animate-fade-in">
+      <Link href="/mahasiswa/inventaris" className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-navy-800 mb-6 transition-colors animate-fade-in">
         <ArrowLeft className="w-4 h-4" />
         Kembali ke Inventaris
       </Link>
@@ -201,15 +201,15 @@ export default function DetailAlatPage({ params }: { params: Promise<{ id: strin
                 </div>
                 
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-800 mb-2 font-[family-name:var(--font-heading)]">{eq.name}</h1>
-                <p className="text-sm text-gray-500 font-medium mb-6">{lab.fullName}</p>
+                <p className="text-sm text-slate-600 font-medium mb-6">{lab.fullName}</p>
                 
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
-                    <div className="text-xs text-gray-500 mb-1">Stok Tersedia</div>
-                    <div className="text-2xl font-bold text-navy-800 font-[family-name:var(--font-heading)]">{eq.availableStock} <span className="text-sm font-medium text-gray-400">/ {eq.totalStock}</span></div>
+                    <div className="text-xs text-slate-600 mb-1">Stok Tersedia</div>
+                    <div className="text-2xl font-bold text-navy-800 font-[family-name:var(--font-heading)]">{eq.availableStock} <span className="text-sm font-medium text-slate-500">/ {eq.totalStock}</span></div>
                   </div>
                   <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
-                    <div className="text-xs text-gray-500 mb-1">Kondisi</div>
+                    <div className="text-xs text-slate-600 mb-1">Kondisi</div>
                     <div className="text-lg font-bold text-navy-800 mt-1">{eq.condition}</div>
                   </div>
                 </div>
@@ -268,7 +268,7 @@ export default function DetailAlatPage({ params }: { params: Promise<{ id: strin
               <form onSubmit={handleBorrow} className="space-y-5 animate-fade-in">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-lg font-bold text-navy-800 font-[family-name:var(--font-heading)]">Form Peminjaman</h3>
-                  <button type="button" onClick={() => setIsBorrowing(false)} className="text-sm text-gray-500 hover:text-navy-800 font-medium">Batal</button>
+                  <button type="button" onClick={() => setIsBorrowing(false)} className="text-sm text-slate-600 hover:text-navy-800 font-medium">Batal</button>
                 </div>
 
                 <div>
@@ -287,7 +287,7 @@ export default function DetailAlatPage({ params }: { params: Promise<{ id: strin
                 <div>
                   <label className="block text-sm font-medium text-navy-700 mb-1.5">Tanggal Kembali</label>
                   <div className="relative">
-                    <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-gray-400" />
+                    <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500" />
                     <input 
                       type="date" 
                       min={new Date().toISOString().split('T')[0]}
@@ -324,14 +324,14 @@ export default function DetailAlatPage({ params }: { params: Promise<{ id: strin
                     htmlFor="file-upload"
                     className="block border-2 border-dashed border-gray-200 rounded-xl p-4 text-center hover:bg-gray-50 transition-colors cursor-pointer group"
                   >
-                    <Upload className="w-6 h-6 text-gray-400 mx-auto mb-2 group-hover:text-accent-cyan transition-colors" />
+                    <Upload className="w-6 h-6 text-slate-500 mx-auto mb-2 group-hover:text-accent-cyan transition-colors" />
                     {uploadedFile ? (
                       <div>
                         <span className="text-sm text-accent-cyan font-medium block">{uploadedFile.name}</span>
-                        <span className="text-xs text-gray-500">{(uploadedFile.size / 1024).toFixed(1)} KB</span>
+                        <span className="text-xs text-slate-600">{(uploadedFile.size / 1024).toFixed(1)} KB</span>
                       </div>
                     ) : (
-                      <span className="text-xs text-gray-500 font-medium">Klik untuk upload PDF (Maks 5MB)</span>
+                      <span className="text-xs text-slate-600 font-medium">Klik untuk upload PDF (Maks 5MB)</span>
                     )}
                   </label>
                 </div>

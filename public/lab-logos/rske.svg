@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-labelledby="title desc">
+  <title id="title">Logo Laboratorium RSK&amp;E</title>
+  <desc id="desc">Logo bundar hijau Laboratorium Rekayasa Sistem Kerja dan Ergonomi</desc>
+  <rect width="240" height="240" fill="#fff"/>
+  <circle cx="120" cy="120" r="104" fill="#fff" stroke="#006b3f" stroke-width="10"/>
+  <circle cx="120" cy="120" r="92" fill="none" stroke="#0f8f58" stroke-width="3"/>
+  <path d="M62 80c20-26 70-38 112-12" fill="none" stroke="#6c7378" stroke-width="12" stroke-linecap="round"/>
+  <path d="M58 96c-13 28-7 62 15 86" fill="none" stroke="#6c7378" stroke-width="12" stroke-linecap="round"/>
+  <path d="M184 76c20 20 25 60 8 91" fill="none" stroke="#0a0a0a" stroke-width="6" stroke-linecap="round"/>
+  <path d="M176 79l22-1-8 20z" fill="#0a0a0a"/>
+  <circle cx="165" cy="58" r="10" fill="#0a0a0a"/>
+  <path d="M90 112c15-26 45-26 60 0l-17 77h-26z" fill="#047543"/>
+  <path d="M84 105c15-37 57-37 72 0" fill="none" stroke="#047543" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="120" cy="82" r="18" fill="#047543"/>
+  <path d="M82 134l-11 18m87-17l15 15m-80 44h54" stroke="#0a0a0a" stroke-width="4" stroke-linecap="round"/>
+  <text x="120" y="203" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="800" fill="#111827">RSK&amp;E</text>
+</svg>

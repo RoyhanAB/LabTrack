@@ -1,13 +1,18 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { ArrowRight, Activity, Shield, BarChart3, Users, ChevronRight, Search, ClipboardList, CheckCircle2, UserCheck, Package, Layers, Eye, Server, Crosshair, Menu, X, Monitor, Wrench, Gauge, Mail, Phone, MapPin, ChevronDown } from 'lucide-react';
+import { ArrowRight, Activity, Shield, BarChart3, Users, ChevronRight, Search, ClipboardList, CheckCircle2, UserCheck, Package, Layers, Eye, Server, Crosshair, Menu, X, Mail, Phone, MapPin, ChevronDown } from 'lucide-react';
 import { Logo, PulseDot, Brackets, useCountUp, DISPLAY, BODY, MONO } from '@/components/landing/shared';
 import { supabase } from '@/lib/supabase';
 import { useStore } from '@/lib/store';
 
-const gridBg = { backgroundColor:'#060D1A', backgroundImage:'linear-gradient(rgba(0,201,173,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,201,173,0.04) 1px,transparent 1px)', backgroundSize:'48px 48px' };
+const gridBg = {
+  backgroundColor: '#087EA4',
+  backgroundImage: 'linear-gradient(rgba(255,255,255,0.055) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.045) 1px,transparent 1px),linear-gradient(180deg,#064B7A 0%,#0A90A9 100%)',
+  backgroundSize: '48px 48px,48px 48px,auto'
+};
 
 export default function LandingPage() {
   const { equipment, laboratories, loans } = useStore();
@@ -50,83 +55,82 @@ export default function LandingPage() {
   return (
     <div className="overflow-x-hidden">
       {/* NAVBAR */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-[#060D1A]/95 backdrop-blur-xl border-b border-teal-500/10 shadow-lg shadow-black/20' : 'bg-transparent'}`}>
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-[#063B62]/95 backdrop-blur-xl border-b border-[#0EA5C6]/10 shadow-lg shadow-black/20' : 'bg-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Logo />
           <nav className="hidden md:flex items-center gap-8">
             {['Home','Tentang','Laboratorium','Cara Peminjaman'].map(item => (
-              <a key={item} href={`#${item.toLowerCase().replace(/ /g,'-')}`} className="text-sm text-slate-400 hover:text-teal-400 transition-colors" style={{fontFamily:BODY}}>{item}</a>
+              <a key={item} href={`#${item.toLowerCase().replace(/ /g,'-')}`} className="text-sm text-[#D8F6FB]/75 hover:text-[#F7FDFF] transition-colors" style={{fontFamily:BODY}}>{item}</a>
             ))}
           </nav>
           <div className="flex items-center gap-3">
-            <Link href="/login" className="hidden md:flex items-center gap-2 px-5 py-2 rounded bg-teal-500 hover:bg-teal-400 text-[#060D1A] text-sm font-semibold transition-all hover:shadow-[0_0_24px_rgba(0,201,173,0.45)]" style={{fontFamily:BODY}}>Login</Link>
+            <Link href="/login" className="hidden md:flex items-center gap-2 px-5 py-2 rounded bg-[#0EA5C6] hover:bg-[#35C7E6] text-[#063B62] text-sm font-semibold transition-all hover:shadow-[0_0_24px_rgba(14,165,198,0.45)]" style={{fontFamily:BODY}}>Login</Link>
             <button className="md:hidden text-slate-400 hover:text-white" onClick={() => setMobileMenu(!mobileMenu)}>{mobileMenu ? <X className="w-5 h-5"/> : <Menu className="w-5 h-5"/>}</button>
           </div>
         </div>
         {mobileMenu && (
-          <div className="md:hidden bg-[#0C1829] border-t border-teal-500/10 px-6 py-5 flex flex-col gap-4">
+          <div className="md:hidden bg-[#074B73] border-t border-[#0EA5C6]/10 px-6 py-5 flex flex-col gap-4">
             {['Home','Tentang','Laboratorium','Cara Peminjaman'].map(item => (
               <a key={item} href={`#${item.toLowerCase().replace(/ /g,'-')}`} onClick={() => setMobileMenu(false)} className="text-slate-300 text-sm text-left py-1" style={{fontFamily:BODY}}>{item}</a>
             ))}
-            <Link href="/login" className="mt-1 py-2.5 rounded bg-teal-500 text-[#060D1A] text-sm font-semibold text-center" style={{fontFamily:BODY}}>Login</Link>
+            <Link href="/login" className="mt-1 py-2.5 rounded bg-[#0EA5C6] text-[#063B62] text-sm font-semibold text-center" style={{fontFamily:BODY}}>Login</Link>
           </div>
         )}
       </header>
 
       {/* HERO */}
       <section id="home" className="relative min-h-screen flex flex-col overflow-hidden" style={gridBg}>
-        <div className="absolute inset-0 pointer-events-none" style={{background:'radial-gradient(ellipse 65% 55% at 18% 55%,rgba(0,201,173,0.10) 0%,transparent 65%)'}}/>
-        <motion.div className="absolute left-0 right-0 h-px pointer-events-none" style={{background:'linear-gradient(90deg,transparent 5%,rgba(0,201,173,0.5) 30%,rgba(0,201,173,0.9) 50%,rgba(0,201,173,0.5) 70%,transparent 95%)'}} animate={{top:['8%','92%']}} transition={{duration:6,repeat:Infinity,ease:'linear',repeatType:'reverse'}}/>
+        <div className="absolute inset-0 pointer-events-none" style={{background:'radial-gradient(ellipse 65% 55% at 18% 55%,rgba(14,165,198,0.10) 0%,transparent 65%)'}}/>
         <div className="relative flex-1 flex items-center max-w-7xl mx-auto px-6 w-full pt-20 pb-8">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-12 xl:gap-20 items-center w-full">
             <div>
-              <motion.div initial={{opacity:0,x:-24}} animate={{opacity:1,x:0}} transition={{delay:0.1}} className="inline-flex items-center gap-2.5 mb-8 px-3.5 py-1.5 rounded border border-teal-500/20 bg-teal-500/5">
+              <motion.div initial={{opacity:0,x:-24}} animate={{opacity:1,x:0}} transition={{delay:0.1}} className="inline-flex items-center gap-2.5 mb-8 px-3.5 py-1.5 rounded border border-[#0EA5C6]/20 bg-[#0EA5C6]/5">
                 <PulseDot/>
-                <span className="text-teal-400 text-[11px] font-medium tracking-[0.14em] uppercase" style={{fontFamily:MONO}}>Teknik Industri · Universitas Sultan Ageng Tirtayasa</span>
+                <span className="text-[#F7FDFF] text-[11px] font-medium tracking-[0.14em] uppercase" style={{fontFamily:MONO}}>Teknik Industri · Universitas Sultan Ageng Tirtayasa</span>
               </motion.div>
               <div style={{fontFamily:DISPLAY}} className="leading-[0.9] mb-7">
                 {[{text:'SISTEM',delay:0.18},{text:'PEMINJAMAN',delay:0.26},{text:'ALAT',delay:0.34}].map(({text,delay})=>(
                   <motion.div key={text} initial={{opacity:0,y:40}} animate={{opacity:1,y:0}} transition={{delay,duration:0.55,ease:[0.22,1,0.36,1]}} className="text-[56px] md:text-[72px] lg:text-[88px] font-black text-white tracking-[-0.01em]">{text}</motion.div>
                 ))}
-                <motion.div initial={{opacity:0,y:40}} animate={{opacity:1,y:0}} transition={{delay:0.42,duration:0.55,ease:[0.22,1,0.36,1]}} className="text-[56px] md:text-[72px] lg:text-[88px] font-black text-teal-400 tracking-[-0.01em]">LABORATORIUM</motion.div>
+                <motion.div initial={{opacity:0,y:40}} animate={{opacity:1,y:0}} transition={{delay:0.42,duration:0.55,ease:[0.22,1,0.36,1]}} className="text-[56px] md:text-[72px] lg:text-[88px] font-black text-[#F7FDFF] tracking-[-0.01em]">LABORATORIUM</motion.div>
               </div>
-              <motion.p initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{delay:0.52}} className="text-slate-400 text-[15px] leading-relaxed mb-9 max-w-[480px]" style={{fontFamily:BODY}}>Platform terintegrasi untuk peminjaman, monitoring, dan pengelolaan alat laboratorium secara real-time. Dirancang khusus untuk mahasiswa dan asisten lab Teknik Industri UNTIRTA.</motion.p>
+              <motion.p initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{delay:0.52}} className="text-[#D8F6FB]/90 text-[15px] leading-relaxed mb-9 max-w-[480px]" style={{fontFamily:BODY}}>Platform terintegrasi untuk peminjaman, monitoring, dan pengelolaan alat laboratorium secara real-time. Dirancang khusus untuk mahasiswa dan asisten lab Teknik Industri UNTIRTA.</motion.p>
               <motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{delay:0.62}} className="flex items-center gap-4 flex-wrap">
-                <Link href="/login" className="group flex items-center gap-2.5 px-7 py-3.5 rounded bg-teal-500 hover:bg-teal-400 text-[#060D1A] font-semibold text-sm transition-all hover:shadow-[0_0_36px_rgba(0,201,173,0.5)]" style={{fontFamily:BODY}}>Pinjam Alat <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform"/></Link>
-                <Link href="/login" className="group flex items-center gap-2.5 px-7 py-3.5 rounded border border-slate-700 hover:border-teal-500/40 text-slate-300 hover:text-white font-medium text-sm transition-all" style={{fontFamily:BODY}}><Eye className="w-4 h-4 text-slate-500 group-hover:text-teal-400 transition-colors"/>Lihat Inventaris</Link>
+                <Link href="/login" className="group flex items-center gap-2.5 px-7 py-3.5 rounded bg-[#0EA5C6] hover:bg-[#35C7E6] text-[#063B62] font-semibold text-sm transition-all hover:shadow-[0_0_36px_rgba(14,165,198,0.5)]" style={{fontFamily:BODY}}>Pinjam Alat <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform"/></Link>
+                <Link href="/login" className="group flex items-center gap-2.5 px-7 py-3.5 rounded border border-slate-700 hover:border-[#0EA5C6]/40 text-slate-300 hover:text-white font-medium text-sm transition-all" style={{fontFamily:BODY}}><Eye className="w-4 h-4 text-slate-500 group-hover:text-[#F7FDFF] transition-colors"/>Lihat Inventaris</Link>
               </motion.div>
             </div>
             {/* Live Panel */}
             <motion.div initial={{opacity:0,x:48}} animate={{opacity:1,x:0}} transition={{delay:0.45,duration:0.65}} className="hidden lg:block">
-              <div className="relative p-5 rounded-xl border border-teal-500/15 bg-[#0C1829]/90 backdrop-blur-sm shadow-2xl shadow-black/40">
+              <div className="relative p-5 rounded-xl border border-[#0EA5C6]/15 bg-[#074B73]/90 backdrop-blur-sm shadow-2xl shadow-black/40">
                 <Brackets/>
                 <div className="flex items-center justify-between mb-5 pb-4 border-b border-white/5">
-                  <div className="flex items-center gap-2"><PulseDot/><span className="text-teal-400 text-[11px] tracking-[0.14em] uppercase" style={{fontFamily:MONO}}>LIVE · SISTEM MONITOR</span></div>
-                  <span className="text-slate-600 text-[10px]" style={{fontFamily:MONO}}>SYS_v2.4.1</span>
+                  <div className="flex items-center gap-2"><PulseDot/><span className="text-[#F7FDFF] text-[11px] tracking-[0.14em] uppercase" style={{fontFamily:MONO}}>LIVE · SISTEM MONITOR</span></div>
+                  <span className="text-[#BCEFF7]/55 text-[10px]" style={{fontFamily:MONO}}>SYS_v2.4.1</span>
                 </div>
                 <div className="grid grid-cols-3 gap-3 mb-5">
-                  {[{label:'Total Alat',val:alat,icon:Package,color:'text-teal-400'},{label:'Laboratorium',val:labs,icon:Layers,color:'text-teal-400'},{label:'Pengguna',val:users,icon:Users,color:'text-orange-400'}].map(({label,val,icon:Icon,color})=>(
-                    <div key={label} className="p-3 rounded-lg bg-[#060D1A] border border-white/5">
+                  {[{label:'Total Alat',val:alat,icon:Package,color:'text-[#F7FDFF]'},{label:'Laboratorium',val:labs,icon:Layers,color:'text-[#F7FDFF]'},{label:'Pengguna',val:users,icon:Users,color:'text-[#A7E9F5]'}].map(({label,val,icon:Icon,color})=>(
+                    <div key={label} className="p-3 rounded-lg bg-[#063B62] border border-white/5">
                       <div className="flex items-start justify-between mb-2"><Icon className={`w-3.5 h-3.5 ${color} mt-0.5`}/><span className={`text-2xl font-bold tabular-nums ${color}`} style={{fontFamily:MONO}}>{val}</span></div>
-                      <span className="text-slate-600 text-[11px]" style={{fontFamily:BODY}}>{label}</span>
+                      <span className="text-[#BCEFF7]/70 text-[11px]" style={{fontFamily:BODY}}>{label}</span>
                     </div>
                   ))}
                 </div>
                 <div>
-                  <div className="flex items-center justify-between mb-3"><span className="text-slate-500 text-[11px] uppercase tracking-wider" style={{fontFamily:MONO}}>Peminjaman Aktif</span><span className="text-[11px] px-2 py-0.5 rounded bg-teal-500/10 text-teal-400 font-medium" style={{fontFamily:MONO}}>{activeLoans.length} AKTIF</span></div>
+                  <div className="flex items-center justify-between mb-3"><span className="text-slate-500 text-[11px] uppercase tracking-wider" style={{fontFamily:MONO}}>Peminjaman Aktif</span><span className="text-[11px] px-2 py-0.5 rounded bg-[#0EA5C6]/10 text-[#F7FDFF] font-medium" style={{fontFamily:MONO}}>{activeLoans.length} AKTIF</span></div>
                   <div className="space-y-2">
                     {activeLoans.length > 0 ? activeLoans.map((item, i) => (
-                      <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-[#060D1A] border border-white/5 hover:border-teal-500/15 transition-colors">
-                        <div className="min-w-0"><div className="text-white text-[13px] font-medium truncate mb-0.5" style={{fontFamily:BODY}}>{item.name}</div><div className="text-slate-600 text-[11px]" style={{fontFamily:MONO}}>{item.lab} · {item.user}</div></div>
+                      <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-[#063B62] border border-white/5 hover:border-[#0EA5C6]/15 transition-colors">
+                        <div className="min-w-0"><div className="text-white text-[13px] font-medium truncate mb-0.5" style={{fontFamily:BODY}}>{item.name}</div><div className="text-[#BCEFF7]/65 text-[11px]" style={{fontFamily:MONO}}>{item.lab} · {item.user}</div></div>
                         <span className={`ml-3 text-[11px] px-2 py-0.5 rounded font-medium flex-shrink-0 ${
-                          item.status === 'dipinjam' ? 'bg-teal-500/10 text-teal-400' :
+                          item.status === 'dipinjam' ? 'bg-[#0EA5C6]/10 text-[#F7FDFF]' :
                           item.status === 'terlambat' ? 'bg-red-500/10 text-red-400' :
-                          'bg-orange-500/10 text-orange-400'
+                          'bg-[#0EA5C6]/10 text-[#A7E9F5]'
                         }`} style={{fontFamily:MONO}}>{item.status === 'dipinjam' ? 'DIPINJAM' : item.status === 'terlambat' ? 'TERLAMBAT' : 'REVIEW'}</span>
                       </div>
                     )) : (
-                      <div className="p-4 text-center border border-white/5 rounded-lg bg-[#060D1A]/50">
-                        <span className="text-slate-600 text-[11px]" style={{fontFamily:MONO}}>TIDAK ADA PEMINJAMAN</span>
+                      <div className="p-4 text-center border border-white/5 rounded-lg bg-[#063B62]/50">
+                        <span className="text-[#BCEFF7]/65 text-[11px]" style={{fontFamily:MONO}}>TIDAK ADA PEMINJAMAN</span>
                       </div>
                     )}
                   </div>
@@ -136,12 +140,12 @@ export default function LandingPage() {
           </div>
         </div>
         {/* Bottom Strip */}
-        <motion.div initial={{opacity:0,y:16}} animate={{opacity:1,y:0}} transition={{delay:0.78}} className="relative border-t border-white/5 bg-[#060D1A]/60">
+        <motion.div initial={{opacity:0,y:16}} animate={{opacity:1,y:0}} transition={{delay:0.78}} className="relative border-t border-white/5 bg-[#063B62]/60">
           <div className="max-w-7xl mx-auto px-6 py-5 grid grid-cols-2 md:grid-cols-4 gap-6">
             {[{label:'Status Alat',val:'Real-time',icon:Activity},{label:'Uptime Sistem',val:'24/7',icon:Server},{label:'Akurasi Data',val:'100%',icon:Crosshair},{label:'Role Akses',val:'Multi-Role',icon:Shield}].map(({label,val,icon:Icon})=>(
               <div key={label} className="flex items-center gap-3 group">
-                <div className="w-9 h-9 rounded-lg bg-teal-500/5 border border-teal-500/15 flex items-center justify-center flex-shrink-0 group-hover:border-teal-500/35 transition-colors"><Icon className="w-4 h-4 text-teal-400"/></div>
-                <div><div className="text-white font-semibold text-sm" style={{fontFamily:BODY}}>{val}</div><div className="text-slate-600 text-xs" style={{fontFamily:BODY}}>{label}</div></div>
+                <div className="w-9 h-9 rounded-lg bg-[#0EA5C6]/5 border border-[#0EA5C6]/15 flex items-center justify-center flex-shrink-0 group-hover:border-[#0EA5C6]/35 transition-colors"><Icon className="w-4 h-4 text-[#F7FDFF]"/></div>
+                <div><div className="text-white font-semibold text-sm" style={{fontFamily:BODY}}>{val}</div><div className="text-[#BCEFF7]/70 text-xs" style={{fontFamily:BODY}}>{label}</div></div>
               </div>
             ))}
           </div>
@@ -154,17 +158,17 @@ export default function LandingPage() {
         <div className="relative max-w-7xl mx-auto px-6">
           <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div>
-              <div className="flex items-center gap-3 mb-5"><div className="h-px w-10 bg-teal-500"/><span className="text-teal-500 text-[11px] font-medium tracking-[0.22em] uppercase" style={{fontFamily:MONO}}>Tentang LabTrack</span></div>
-              <h2 className="text-[48px] md:text-[64px] font-black text-slate-900 leading-[0.92] tracking-tight" style={{fontFamily:DISPLAY}}>KENAPA HARUS<br/><span className="text-teal-500">LABTRACK?</span></h2>
+              <div className="flex items-center gap-3 mb-5"><div className="h-px w-10 bg-[#0EA5C6]"/><span className="text-[#087EA4] text-[11px] font-medium tracking-[0.22em] uppercase" style={{fontFamily:MONO}}>Tentang LabTrack</span></div>
+              <h2 className="text-[48px] md:text-[64px] font-black text-slate-900 leading-[0.92] tracking-tight" style={{fontFamily:DISPLAY}}>KENAPA HARUS<br/><span className="text-[#087EA4]">LABTRACK?</span></h2>
             </div>
             <p className="text-slate-500 max-w-xs text-sm leading-relaxed md:text-right md:pb-2" style={{fontFamily:BODY}}>Sistem manajemen peminjaman alat laboratorium yang dirancang untuk mempermudah dan mempercepat setiap proses.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {[
-              {icon:Activity,title:'Real-time Monitoring',desc:'Status alat dan peminjaman terupdate secara real-time tanpa perlu refresh manual.',badge:'01',accent:'text-teal-600',bg:'bg-teal-50',bar:'bg-teal-500'},
-              {icon:Shield,title:'Aman & Terstruktur',desc:'Data peminjaman tersimpan rapi, teraudit, dan terlindungi dengan sistem validasi berlapis.',badge:'02',accent:'text-blue-600',bg:'bg-blue-50',bar:'bg-blue-500'},
-              {icon:BarChart3,title:'Dashboard Monitoring',desc:'Visualisasi data peminjaman, inventaris, dan aktivitas laboratorium dalam satu tampilan.',badge:'03',accent:'text-violet-600',bg:'bg-violet-50',bar:'bg-violet-500'},
-              {icon:Users,title:'Multi-Role Access',desc:'Akses berbeda untuk mahasiswa dan asisten lab — setiap peran melihat fungsi yang relevan.',badge:'04',accent:'text-orange-600',bg:'bg-orange-50',bar:'bg-orange-500'},
+              {icon:Activity,title:'Real-time Monitoring',desc:'Status alat dan peminjaman terupdate secara real-time tanpa perlu refresh manual.',badge:'01',accent:'text-[#087EA4]',bg:'bg-[#E8F8FC]',bar:'bg-[#0EA5C6]'},
+              {icon:Shield,title:'Aman & Terstruktur',desc:'Data peminjaman tersimpan rapi, teraudit, dan terlindungi dengan sistem validasi berlapis.',badge:'02',accent:'text-[#064B7A]',bg:'bg-[#E8F8FC]',bar:'bg-[#087EA4]'},
+              {icon:BarChart3,title:'Dashboard Monitoring',desc:'Visualisasi data peminjaman, inventaris, dan aktivitas laboratorium dalam satu tampilan.',badge:'03',accent:'text-[#0A90A9]',bg:'bg-[#E8F8FC]',bar:'bg-[#0A90A9]'},
+              {icon:Users,title:'Multi-Role Access',desc:'Akses berbeda untuk mahasiswa dan asisten lab — setiap peran melihat fungsi yang relevan.',badge:'04',accent:'text-[#063B62]',bg:'bg-[#E8F8FC]',bar:'bg-[#063B62]'},
             ].map((f,i)=>(
               <motion.div key={f.badge} initial={{opacity:0,y:32}} whileInView={{opacity:1,y:0}} viewport={{once:true,margin:'-60px'}} transition={{delay:i*0.09,duration:0.5}} whileHover={{y:-5}} className="group relative p-8 rounded-xl border border-slate-100 hover:border-slate-200 bg-white hover:shadow-xl transition-all duration-300 overflow-hidden">
                 <div className="absolute -bottom-3 -right-2 text-8xl font-black text-slate-50 select-none leading-none" style={{fontFamily:DISPLAY}}>{f.badge}</div>
@@ -183,29 +187,31 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 mb-5 px-4 py-1.5 rounded-full border border-slate-200 bg-white text-slate-500 text-[11px] tracking-[0.18em] uppercase" style={{fontFamily:MONO}}>Laboratorium</div>
-            <h2 className="text-[48px] md:text-[64px] font-black text-slate-900 leading-[0.92] tracking-tight mb-5" style={{fontFamily:DISPLAY}}>4 LABORATORIUM<br/><span className="text-teal-500">TEKNIK INDUSTRI</span></h2>
+            <h2 className="text-[48px] md:text-[64px] font-black text-slate-900 leading-[0.92] tracking-tight mb-5" style={{fontFamily:DISPLAY}}>4 LABORATORIUM<br/><span className="text-[#087EA4]">TEKNIK INDUSTRI</span></h2>
             <p className="text-slate-500 max-w-md mx-auto text-sm leading-relaxed" style={{fontFamily:BODY}}>Kelola alat dari seluruh laboratorium dalam satu platform terintegrasi.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {[
-              {id:'LSIPro',labId:'lsi',name:'Lab. Sistem Produksi',desc:'Simulasi proses produksi dan analisis produktivitas kerja',icon:Monitor,color:'bg-blue-500',active:true},
-              {id:'RSK&E',labId:'rske',name:'Lab. Rekayasa Sistem Kerja & Ergonomi',desc:'Perancangan sistem kerja dan analisis ergonomi',icon:Users,color:'bg-orange-500',active:true},
-              {id:'OSI&K',labId:'osik',name:'Lab. Optimasi Sistem Industri & Kualitas',desc:'Pengendalian kualitas produk dan optimasi proses industri',icon:Wrench,color:'bg-teal-500',active:true},
-              {id:'SMI',labId:'smi',name:'Studio Manajemen Industri',desc:'Simulasi manajemen industri, perencanaan produksi, dan analisis sistem bisnis',icon:Gauge,color:'bg-violet-500',active:true},
+              {id:'LSIPro',labId:'lsi',name:'Lab. Sistem Produksi',desc:'Simulasi proses produksi dan analisis produktivitas kerja',logo:'/lab-logos/lsipro.svg',active:true},
+              {id:'RSK&E',labId:'rske',name:'Lab. Rekayasa Sistem Kerja & Ergonomi',desc:'Perancangan sistem kerja dan analisis ergonomi',logo:'/lab-logos/rske.svg',active:true},
+              {id:'OSI&K',labId:'osik',name:'Lab. Optimasi Sistem Industri & Kualitas',desc:'Pengendalian kualitas produk dan optimasi proses industri',logo:'/lab-logos/osik.svg',active:true},
+              {id:'SMI',labId:'smi',name:'Studio Manajemen Industri',desc:'Simulasi manajemen industri, perencanaan produksi, dan analisis sistem bisnis',logo:'/lab-logos/smi.svg',active:true},
             ].map((lab,i)=>(
-              <motion.div key={lab.id} initial={{opacity:0,scale:0.96}} whileInView={{opacity:1,scale:1}} viewport={{once:true}} transition={{delay:i*0.08}} whileHover={{y:-4}} className="group relative p-6 rounded-xl border border-slate-200 bg-white hover:border-teal-300/60 transition-all duration-300 cursor-pointer overflow-hidden">
-                <div className="flex items-start gap-4">
-                  <div className={`w-12 h-12 rounded-xl ${lab.color} flex items-center justify-center flex-shrink-0 shadow-lg`}><lab.icon className="w-6 h-6 text-white"/></div>
+              <motion.div key={lab.id} initial={{opacity:0,scale:0.96}} whileInView={{opacity:1,scale:1}} viewport={{once:true}} transition={{delay:i*0.08}} whileHover={{y:-4}} className="group relative p-6 rounded-xl border border-slate-200 bg-white hover:border-[#0EA5C6]/60 transition-all duration-300 cursor-pointer overflow-hidden">
+                <div className="flex items-start gap-5">
+                  <div className="w-20 h-20 rounded-xl bg-white border border-slate-100 shadow-sm flex items-center justify-center flex-shrink-0 overflow-hidden p-2">
+                    <Image src={lab.logo} alt={`Logo ${lab.name}`} width={80} height={80} className="w-full h-full object-contain" />
+                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-[11px] font-semibold text-teal-500 uppercase tracking-widest" style={{fontFamily:MONO}}>{lab.id}</span>
+                      <span className="text-[11px] font-semibold text-[#087EA4] uppercase tracking-widest" style={{fontFamily:MONO}}>{lab.id}</span>
                       <div className="flex items-center gap-1.5"><PulseDot active={lab.active}/><span className="text-[11px] text-slate-400" style={{fontFamily:MONO}}>{lab.active?'AKTIF':'MAINTENANCE'}</span></div>
                     </div>
                     <h3 className="text-[17px] font-bold text-slate-900 leading-snug mb-1.5" style={{fontFamily:DISPLAY}}>{lab.name}</h3>
                     <p className="text-slate-500 text-sm mb-4" style={{fontFamily:BODY}}>{lab.desc}</p>
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] text-slate-400" style={{fontFamily:MONO}}>{equipment.filter(item => item.labId === lab.labId).length} alat terdaftar</span>
-                      <div className="flex items-center gap-1 text-slate-400 group-hover:text-teal-500 transition-colors"><span className="text-[12px] font-medium" style={{fontFamily:BODY}}>Lihat Alat</span><ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform"/></div>
+                      <div className="flex items-center gap-1 text-slate-400 group-hover:text-[#087EA4] transition-colors"><span className="text-[12px] font-medium" style={{fontFamily:BODY}}>Lihat Alat</span><ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform"/></div>
                     </div>
                   </div>
                 </div>
@@ -217,14 +223,14 @@ export default function LandingPage() {
 
       {/* STEPS */}
       <section id="cara-peminjaman" className="py-28 relative overflow-hidden" style={gridBg}>
-        <div className="absolute inset-0 pointer-events-none" style={{background:'radial-gradient(ellipse 90% 60% at 50% 50%,rgba(0,201,173,0.06) 0%,transparent 70%)'}}/>
+        <div className="absolute inset-0 pointer-events-none" style={{background:'radial-gradient(ellipse 90% 60% at 50% 50%,rgba(14,165,198,0.06) 0%,transparent 70%)'}}/>
         <div className="relative max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <div className="flex items-center justify-center gap-4 mb-5"><div className="h-px w-12 bg-gradient-to-r from-transparent to-teal-500"/><span className="text-teal-400 text-[11px] tracking-[0.22em] uppercase" style={{fontFamily:MONO}}>Cara Peminjaman</span><div className="h-px w-12 bg-gradient-to-l from-transparent to-teal-500"/></div>
-            <h2 className="text-[48px] md:text-[64px] font-black text-white leading-[0.92] tracking-tight" style={{fontFamily:DISPLAY}}>EMPAT LANGKAH<br/><span className="text-teal-400">MUDAH & CEPAT</span></h2>
+            <div className="flex items-center justify-center gap-4 mb-5"><div className="h-px w-12 bg-gradient-to-r from-transparent to-[#0EA5C6]"/><span className="text-[#F7FDFF] text-[11px] tracking-[0.22em] uppercase" style={{fontFamily:MONO}}>Cara Peminjaman</span><div className="h-px w-12 bg-gradient-to-l from-transparent to-[#0EA5C6]"/></div>
+            <h2 className="text-[48px] md:text-[64px] font-black text-white leading-[0.92] tracking-tight" style={{fontFamily:DISPLAY}}>EMPAT LANGKAH<br/><span className="text-[#F7FDFF]">MUDAH & CEPAT</span></h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-5 relative">
-            <div className="hidden md:block absolute top-[52px] left-[12.5%] right-[12.5%] h-px"><div className="w-full h-full bg-gradient-to-r from-teal-500/20 via-teal-500/40 to-teal-500/20"/></div>
+            <div className="hidden md:block absolute top-[52px] left-[12.5%] right-[12.5%] h-px"><div className="w-full h-full bg-gradient-to-r from-[#0EA5C6]/20 via-[#F7FDFF]/40 to-[#0EA5C6]/20"/></div>
             {[
               {num:'01',title:'Pilih Alat',desc:'Telusuri inventaris dan pilih alat yang ingin dipinjam dari laboratorium.',icon:Search},
               {num:'02',title:'Ajukan Peminjaman',desc:'Isi formulir peminjaman dengan data lengkap dan jadwal penggunaan.',icon:ClipboardList},
@@ -232,11 +238,11 @@ export default function LandingPage() {
               {num:'04',title:'Ambil & Gunakan',desc:'Ambil alat di lab sesuai jadwal dan gunakan dengan bertanggung jawab.',icon:CheckCircle2},
             ].map((step,i)=>(
               <motion.div key={step.num} initial={{opacity:0,y:36}} whileInView={{opacity:1,y:0}} viewport={{once:true}} transition={{delay:i*0.13,duration:0.5}}>
-                <div className="group relative p-6 rounded-xl border border-teal-500/15 bg-[#0C1829] hover:border-teal-500/35 transition-all duration-300 h-full">
+                <div className="group relative p-6 rounded-xl border border-[#0EA5C6]/15 bg-[#074B73] hover:border-[#0EA5C6]/35 transition-all duration-300 h-full">
                   <Brackets/>
                   <div className="flex items-start justify-between mb-5">
-                    <div className="w-11 h-11 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center group-hover:bg-teal-500/20 transition-colors"><step.icon className="w-5 h-5 text-teal-400"/></div>
-                    <span className="text-4xl font-black text-teal-500/15 leading-none" style={{fontFamily:DISPLAY}}>{step.num}</span>
+                    <div className="w-11 h-11 rounded-lg bg-[#0EA5C6]/10 border border-[#0EA5C6]/20 flex items-center justify-center group-hover:bg-[#0EA5C6]/20 transition-colors"><step.icon className="w-5 h-5 text-[#F7FDFF]"/></div>
+                    <span className="text-4xl font-black text-[#087EA4]/15 leading-none" style={{fontFamily:DISPLAY}}>{step.num}</span>
                   </div>
                   <h3 className="text-[18px] font-bold text-white mb-2.5" style={{fontFamily:DISPLAY}}>{step.title}</h3>
                   <p className="text-slate-500 text-sm leading-relaxed" style={{fontFamily:BODY}}>{step.desc}</p>
@@ -249,7 +255,7 @@ export default function LandingPage() {
 
       {/* FAQ */}
       <section className="py-28 relative overflow-hidden bg-white">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-teal-50 rounded-full blur-[100px] opacity-60 pointer-events-none"/>
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#E8F8FC] rounded-full blur-[100px] opacity-60 pointer-events-none"/>
         <div className="relative max-w-3xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-[40px] md:text-[56px] font-black text-slate-900 leading-[0.92] tracking-tight mb-4" style={{fontFamily:DISPLAY}}>FAQ</h2>
@@ -270,7 +276,7 @@ export default function LandingPage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="border-t border-white/5 py-14" style={{background:'#060D1A'}}>
+      <footer className="border-t border-white/5 py-14" style={{background:'#063B62'}}>
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-5">
           <div>
             <Logo/>
@@ -280,22 +286,22 @@ export default function LandingPage() {
             <h4 className="text-white text-lg font-bold mb-5" style={{fontFamily:DISPLAY}}>Hubungi Pengelola</h4>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
-                <div className="text-teal-500 mt-0.5"><Mail className="w-4 h-4"/></div>
-                <div><div className="text-slate-400 text-[11px] mb-0.5" style={{fontFamily:MONO}}>EMAIL</div><a href="mailto:3333230025@untirta.ac.id" className="text-slate-300 hover:text-teal-400 transition-colors text-sm font-medium" style={{fontFamily:BODY}}>3333230025@untirta.ac.id</a></div>
+                <div className="text-[#087EA4] mt-0.5"><Mail className="w-4 h-4"/></div>
+                <div><div className="text-slate-400 text-[11px] mb-0.5" style={{fontFamily:MONO}}>EMAIL</div><a href="mailto:3333230025@untirta.ac.id" className="text-slate-300 hover:text-[#F7FDFF] transition-colors text-sm font-medium" style={{fontFamily:BODY}}>3333230025@untirta.ac.id</a></div>
               </li>
               <li className="flex items-start gap-3">
-                <div className="text-teal-500 mt-0.5"><Phone className="w-4 h-4"/></div>
-                <div><div className="text-slate-400 text-[11px] mb-0.5" style={{fontFamily:MONO}}>WHATSAPP</div><a href="https://wa.me/6283806241350" target="_blank" rel="noreferrer" className="text-slate-300 hover:text-teal-400 transition-colors text-sm font-medium" style={{fontFamily:BODY}}>+62 838-0624-1350</a></div>
+                <div className="text-[#087EA4] mt-0.5"><Phone className="w-4 h-4"/></div>
+                <div><div className="text-slate-400 text-[11px] mb-0.5" style={{fontFamily:MONO}}>WHATSAPP</div><a href="https://wa.me/6283806241350" target="_blank" rel="noreferrer" className="text-slate-300 hover:text-[#F7FDFF] transition-colors text-sm font-medium" style={{fontFamily:BODY}}>+62 838-0624-1350</a></div>
               </li>
               <li className="flex items-start gap-3">
-                <div className="text-teal-500 mt-0.5"><MapPin className="w-4 h-4"/></div>
+                <div className="text-[#087EA4] mt-0.5"><MapPin className="w-4 h-4"/></div>
                 <div><div className="text-slate-400 text-[11px] mb-0.5" style={{fontFamily:MONO}}>LOKASI</div><span className="text-slate-300 text-sm font-medium" style={{fontFamily:BODY}}>Ruang labLSIPro</span></div>
               </li>
             </ul>
           </div>
           <div className="flex flex-col items-start md:items-end justify-between">
-            <div className="flex items-center gap-2"><PulseDot active={true}/><span className="text-teal-400 text-[11px] tracking-widest uppercase" style={{fontFamily:MONO}}>Sistem Online</span></div>
-            <p className="text-slate-600 text-sm text-left md:text-right mt-10 md:mt-0" style={{fontFamily:BODY}}>© 2026 LabTrack<br/>Teknik Industri, Universitas Sultan Ageng Tirtayasa</p>
+            <div className="flex items-center gap-2"><PulseDot active={true}/><span className="text-[#F7FDFF] text-[11px] tracking-widest uppercase" style={{fontFamily:MONO}}>Sistem Online</span></div>
+            <p className="text-[#BCEFF7]/70 text-sm text-left md:text-right mt-10 md:mt-0" style={{fontFamily:BODY}}>© 2026 LabTrack<br/>Teknik Industri, Universitas Sultan Ageng Tirtayasa</p>
           </div>
         </div>
       </footer>
@@ -320,7 +326,7 @@ function FaqItem({ question, answer, index }: { question: string, answer: string
       >
         <span className="font-bold text-slate-800" style={{fontFamily:DISPLAY}}>{question}</span>
         <div className={`w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm border border-slate-200 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
-          <ChevronDown className="w-4 h-4 text-teal-600" />
+          <ChevronDown className="w-4 h-4 text-[#087EA4]" />
         </div>
       </button>
       <motion.div 

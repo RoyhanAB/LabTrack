@@ -23,14 +23,14 @@ export default function ActivityLogPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 animate-fade-in-up">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-800 font-[family-name:var(--font-heading)]">Activity Log</h1>
-          <p className="text-gray-500 mt-1">Catatan seluruh aktivitas sistem LabTrack.</p>
+          <p className="text-slate-600 mt-1">Catatan seluruh aktivitas sistem LabTrack.</p>
         </div>
       </div>
 
       <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm mb-6 animate-fade-in-up stagger-2">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
             <input 
               type="text" 
               placeholder="Cari berdasarkan nama atau deskripsi aktivitas..." 
@@ -40,7 +40,7 @@ export default function ActivityLogPage() {
             />
           </div>
           <div className="w-full md:w-48 relative">
-            <Filter className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Filter className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
             <select 
               value={selectedRole}
               onChange={(e) => setSelectedRole(e.target.value)}
@@ -57,8 +57,8 @@ export default function ActivityLogPage() {
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden animate-fade-in-up stagger-3 p-6">
         {filteredLogs.length === 0 ? (
           <div className="text-center py-12">
-            <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500">Tidak ada log aktivitas ditemukan.</p>
+            <FileText className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+            <p className="text-slate-600">Tidak ada log aktivitas ditemukan.</p>
           </div>
         ) : (
           <div className="relative border-l-2 border-gray-100 ml-4 lg:ml-8 space-y-8 py-4">
@@ -79,7 +79,7 @@ export default function ActivityLogPage() {
                         {log.userRole}
                       </span>
                     </div>
-                    <div className="flex items-center gap-1.5 text-xs font-medium text-gray-400">
+                    <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
                       <Clock className="w-3.5 h-3.5" />
                       {format(new Date(log.createdAt), 'dd MMM yyyy, HH:mm', { locale: id })}
                     </div>
@@ -89,7 +89,7 @@ export default function ActivityLogPage() {
                     {log.description}
                   </p>
                   
-                  <div className="mt-3 inline-block text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded uppercase tracking-wider">
+                  <div className="mt-3 inline-block text-[10px] font-bold text-slate-500 bg-gray-100 px-2 py-1 rounded uppercase tracking-wider">
                     ACT: {log.type.replace('_', ' ')}
                   </div>
                 </div>

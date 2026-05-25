@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-labelledby="title desc">
+  <title id="title">Logo Studio Manajemen Industri</title>
+  <desc id="desc">Logo merah Studio Manajemen Industri</desc>
+  <rect width="240" height="240" fill="#fff"/>
+  <g transform="translate(31 95)" fill="none" stroke="#d71920" stroke-width="5" stroke-linecap="round">
+    <path d="M31 18c-12-18 15-19 10-2 17-14 27 10 6 12 17 12-1 29-11 8-2 23-28 10-9-5-24 7-26-20 4-13"/>
+    <path d="M31 18c4 10 5 16 0 26M19 25h31M24 13l18 28M42 14L20 39"/>
+  </g>
+  <text x="112" y="123" font-family="Brush Script MT, Segoe Script, cursive" font-size="52" font-style="italic" fill="#d71920">studio</text>
+  <text x="124" y="147" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="800" letter-spacing="1.8" fill="#b91c1c">MANAJEMEN INDUSTRI</text>
+</svg>
