@@ -9,8 +9,8 @@ import { Logo, PulseDot, DISPLAY, BODY, MONO } from '@/components/landing/shared
 import toast from 'react-hot-toast';
 
 const gridBg = {
-  backgroundColor: '#087EA4',
-  backgroundImage: 'linear-gradient(rgba(255,255,255,0.055) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.045) 1px,transparent 1px),linear-gradient(180deg,#064B7A 0%,#0A90A9 100%)',
+  backgroundColor: '#1E3A8A',
+  backgroundImage: 'linear-gradient(rgba(255,255,255,0.055) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.045) 1px,transparent 1px),linear-gradient(180deg,#0F172A 0%,#1E40AF 100%)',
   backgroundSize: '48px 48px,48px 48px,auto'
 };
 
@@ -64,22 +64,22 @@ export default function LoginPage() {
     <div className="min-h-screen flex">
       {/* Left Dark Panel */}
       <div className="hidden lg:flex flex-col justify-between w-[46%] xl:w-[42%] p-12 relative overflow-hidden" style={gridBg}>
-        <div className="absolute inset-0 pointer-events-none" style={{background:'radial-gradient(ellipse 75% 75% at 25% 65%,rgba(14,165,198,0.09) 0%,transparent 65%)'}}/>
+        <div className="absolute inset-0 pointer-events-none" style={{background:'radial-gradient(ellipse 75% 75% at 25% 65%,rgba(29,78,216,0.09) 0%,transparent 65%)'}}/>
         <div className="relative"><Logo/></div>
         <div className="relative">
-          <div className="flex items-center gap-2 mb-6"><PulseDot/><span className="text-[#F7FDFF] text-[11px] tracking-[0.18em] uppercase" style={{fontFamily:MONO}}>SISTEM AKTIF · 24/7</span></div>
-          <h2 className="text-[44px] xl:text-[52px] font-black text-white leading-[0.9] mb-5 tracking-tight" style={{fontFamily:DISPLAY}}>KELOLA PEMINJAMAN<br/>ALAT LAB DENGAN<br/><span className="text-[#F7FDFF]">MUDAH & CEPAT</span></h2>
-          <p className="text-[#D8F6FB]/90 max-w-[340px] text-sm leading-relaxed mb-10" style={{fontFamily:BODY}}>Sistem terintegrasi untuk mahasiswa dan asisten laboratorium Teknik Industri UNTIRTA.</p>
+          <div className="flex items-center gap-2 mb-6"><PulseDot/><span className="text-[#F8FAFC] text-[11px] tracking-[0.18em] uppercase" style={{fontFamily:MONO}}>SISTEM AKTIF · 24/7</span></div>
+          <h2 className="text-[44px] xl:text-[52px] font-black text-white leading-[0.9] mb-5 tracking-tight" style={{fontFamily:DISPLAY}}>KELOLA PEMINJAMAN<br/>ALAT LAB DENGAN<br/><span className="text-[#F8FAFC]">MUDAH & CEPAT</span></h2>
+          <p className="text-[#DBEAFE]/90 max-w-[340px] text-sm leading-relaxed mb-10" style={{fontFamily:BODY}}>Sistem terintegrasi untuk mahasiswa dan asisten laboratorium Teknik Industri UNTIRTA.</p>
           <div className="grid grid-cols-3 gap-3">
             {[{val:'Real-time',label:'Status Alat'},{val:'24/7',label:'Akses Sistem'},{val:'100%',label:'Terdokumentasi'}].map(({val,label})=>(
-              <div key={label} className="p-3.5 rounded-lg border border-[#0EA5C6]/12 bg-[#0EA5C6]/5">
-                <div className="text-[#F7FDFF] font-bold text-base mb-0.5" style={{fontFamily:DISPLAY}}>{val}</div>
-                <div className="text-[#BCEFF7]/75 text-[11px]" style={{fontFamily:BODY}}>{label}</div>
+              <div key={label} className="p-3.5 rounded-lg border border-[#1D4ED8]/12 bg-[#1D4ED8]/5">
+                <div className="text-[#F8FAFC] font-bold text-base mb-0.5" style={{fontFamily:DISPLAY}}>{val}</div>
+                <div className="text-[#BFDBFE]/75 text-[11px]" style={{fontFamily:BODY}}>{label}</div>
               </div>
             ))}
           </div>
         </div>
-        <p className="relative text-[#BCEFF7]/60 text-[11px]" style={{fontFamily:MONO}}>© 2026 LabTrack · UNTIRTA Teknik Industri</p>
+        <p className="relative text-[#BFDBFE]/60 text-[11px]" style={{fontFamily:MONO}}>© 2026 LabTrack · UNTIRTA Teknik Industri</p>
       </div>
 
       {/* Right Form */}
@@ -92,7 +92,7 @@ export default function LoginPage() {
           {/* Role Tabs */}
           <div className="flex rounded-xl border border-slate-200 p-1 mb-7 bg-slate-50">
             {(['mahasiswa','admin'] as const).map(r=>(
-              <button key={r} onClick={()=>setRole(r)} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${role===r?'bg-[#063B62] text-white shadow-sm':'text-slate-500 hover:text-slate-800'}`} style={{fontFamily:BODY}}>
+              <button key={r} onClick={()=>setRole(r)} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${role===r?'bg-[#0F172A] text-white shadow-sm':'text-slate-500 hover:text-slate-800'}`} style={{fontFamily:BODY}}>
                 {r==='mahasiswa'?<GraduationCap className="w-4 h-4"/>:<ShieldCheck className="w-4 h-4"/>}
                 {r==='mahasiswa'?'Mahasiswa':'Administrasi'}
               </button>
@@ -104,7 +104,7 @@ export default function LoginPage() {
               <label className="text-sm font-medium text-slate-700 block mb-1.5" style={{fontFamily:BODY}}>Email</label>
               <div className="relative">
                 <Mail className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"/>
-                <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder={role==='mahasiswa'?'3333YYXXXX@untirta.ac.id':'nama@untirta.ac.id'} className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5C6]/25 focus:border-[#0EA5C6] transition-all bg-white" style={{fontFamily:BODY}} required/>
+                <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder={role==='mahasiswa'?'3333YYXXXX@untirta.ac.id':'nama@untirta.ac.id'} className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/25 focus:border-[#1D4ED8] transition-all bg-white" style={{fontFamily:BODY}} required/>
               </div>
             </div>
             <div>
@@ -113,16 +113,16 @@ export default function LoginPage() {
               </div>
               <div className="relative">
                 <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"/>
-                <input type={showPassword?'text':'password'} value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••" className="w-full pl-11 pr-11 py-3 rounded-xl border border-slate-200 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5C6]/25 focus:border-[#0EA5C6] transition-all bg-white" style={{fontFamily:BODY}} required/>
+                <input type={showPassword?'text':'password'} value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••" className="w-full pl-11 pr-11 py-3 rounded-xl border border-slate-200 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/25 focus:border-[#1D4ED8] transition-all bg-white" style={{fontFamily:BODY}} required/>
                 <button type="button" onClick={()=>setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">{showPassword?<EyeOff className="w-4 h-4"/>:<Eye className="w-4 h-4"/>}</button>
               </div>
             </div>
-            <motion.button type="submit" disabled={loading} whileTap={{scale:0.98}} className="w-full py-3.5 rounded-xl bg-[#063B62] hover:bg-[#074B73] text-white font-semibold text-sm flex items-center justify-center gap-2.5 transition-all hover:shadow-lg disabled:opacity-60 mt-2" style={{fontFamily:BODY}}>
+            <motion.button type="submit" disabled={loading} whileTap={{scale:0.98}} className="w-full py-3.5 rounded-xl bg-[#0F172A] hover:bg-[#1E293B] text-white font-semibold text-sm flex items-center justify-center gap-2.5 transition-all hover:shadow-lg disabled:opacity-60 mt-2" style={{fontFamily:BODY}}>
               {loading?<span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"/>:<>{role==='mahasiswa'?'Masuk ke Dashboard':'Masuk ke Admin Panel'}<ArrowRight className="w-4 h-4"/></>}
             </motion.button>
           </form>
 
-          <p className="mt-7 text-center text-sm text-slate-500" style={{fontFamily:BODY}}>Belum punya akun?{' '}<Link href="/register" className="text-[#087EA4] hover:text-[#087EA4] font-semibold transition-colors">Daftar Sekarang</Link></p>
+          <p className="mt-7 text-center text-sm text-slate-500" style={{fontFamily:BODY}}>Belum punya akun?{' '}<Link href="/register" className="text-[#1E3A8A] hover:text-[#1E3A8A] font-semibold transition-colors">Daftar Sekarang</Link></p>
         </div>
       </div>
     </div>

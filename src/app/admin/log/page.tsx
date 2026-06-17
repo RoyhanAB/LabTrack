@@ -74,7 +74,7 @@ export default function ActivityLogPage() {
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-navy-800">{log.userName}</span>
                       <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider ${
-                        log.userRole === 'admin' ? 'bg-cyan-50 text-cyan-700' : 'bg-orange-50 text-orange-700'
+                        log.userRole === 'admin' ? 'bg-cyan-50 text-blue-700' : 'bg-orange-50 text-orange-700'
                       }`}>
                         {log.userRole}
                       </span>

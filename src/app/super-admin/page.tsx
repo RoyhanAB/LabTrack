@@ -54,7 +54,7 @@ export default function SuperAdminPage() {
       icon: Users,
       color: 'from-cyan-500 to-blue-600',
       bgColor: 'bg-cyan-50',
-      textColor: 'text-cyan-600'
+      textColor: 'text-blue-600'
     },
     {
       label: 'Mahasiswa',
@@ -183,9 +183,9 @@ export default function SuperAdminPage() {
 
   const getRoleBadge = (role: string) => {
     const badges = {
-      mahasiswa: 'bg-cyan-100 text-cyan-700',
+      mahasiswa: 'bg-blue-100 text-blue-700',
       admin: 'bg-orange-100 text-orange-700',
-      asisten: 'bg-teal-100 text-teal-700',
+      asisten: 'bg-blue-100 text-blue-700',
       super_admin: 'bg-purple-100 text-purple-700'
     };
     const labels = {

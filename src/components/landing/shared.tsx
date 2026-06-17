@@ -24,13 +24,13 @@ export function useCountUp(to: number, duration = 1600) {
 export function PulseDot({ active = true }: { active?: boolean }) {
   return (
     <span className="relative flex h-2 w-2 flex-shrink-0">
-      {active && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0EA5C6] opacity-75" />}
-      <span className={`relative inline-flex rounded-full h-2 w-2 ${active ? "bg-[#0EA5C6]" : "bg-slate-600"}`} />
+      {active && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#1D4ED8] opacity-75" />}
+      <span className={`relative inline-flex rounded-full h-2 w-2 ${active ? "bg-[#1D4ED8]" : "bg-slate-600"}`} />
     </span>
   );
 }
 
-export function Brackets({ c = "border-[#0EA5C6]/30" }: { c?: string }) {
+export function Brackets({ c = "border-[#1D4ED8]/30" }: { c?: string }) {
   const b = `absolute w-3 h-3 border-[1.5px] ${c}`;
   return (
     <>
@@ -48,11 +48,11 @@ export function Logo({ size = "md" }: { size?: "sm" | "md" }) {
   const txt = size === "sm" ? "text-lg" : "text-2xl";
   return (
     <div className="flex items-center gap-2.5">
-      <div className={`${box} rounded bg-[#0EA5C6]/10 border border-[#F7FDFF]/40 flex items-center justify-center`}>
-        <CircuitBoard className={`${ico} text-[#F7FDFF]`} />
+      <div className={`${box} rounded bg-[#1D4ED8]/10 border border-[#F8FAFC]/40 flex items-center justify-center`}>
+        <CircuitBoard className={`${ico} text-[#F8FAFC]`} />
       </div>
       <span className={`${txt} font-black tracking-tight`} style={{ fontFamily: DISPLAY }}>
-        <span className="text-[#F7FDFF]">Lab</span>
+        <span className="text-[#F8FAFC]">Lab</span>
         <span className="text-white">Track</span>
       </span>
     </div>
