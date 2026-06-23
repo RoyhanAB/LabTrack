@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { CircuitBoard } from 'lucide-react';
+import Image from 'next/image';
 
 export const DISPLAY = "var(--font-display)";
 export const BODY = "var(--font-body)";
@@ -42,19 +43,20 @@ export function Brackets({ c = "border-[#1D4ED8]/30" }: { c?: string }) {
   );
 }
 
-export function Logo({ size = "md" }: { size?: "sm" | "md" }) {
-  const box = size === "sm" ? "w-7 h-7" : "w-9 h-9";
-  const ico = size === "sm" ? "w-3.5 h-3.5" : "w-[18px] h-[18px]";
-  const txt = size === "sm" ? "text-lg" : "text-2xl";
+export function Logo({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
+  const sizeClass = size === "sm" ? "h-10 w-auto" : size === "lg" ? "h-20 w-auto" : "h-14 w-auto";
+  
   return (
-    <div className="flex items-center gap-2.5">
-      <div className={`${box} rounded bg-[#1D4ED8]/10 border border-[#F8FAFC]/40 flex items-center justify-center`}>
-        <CircuitBoard className={`${ico} text-[#F8FAFC]`} />
-      </div>
-      <span className={`${txt} font-black tracking-tight`} style={{ fontFamily: DISPLAY }}>
-        <span className="text-[#F8FAFC]">Lab</span>
-        <span className="text-white">Track</span>
-      </span>
+    <div className="flex items-center">
+      {/* Use fixed intrinsic width/height to avoid hydration mismatches; CSS controls visual size */}
+      <Image 
+        src="/logo.png" 
+        alt="LabTrack Logo" 
+        width={320} 
+        height={80} 
+        className={`object-contain ${sizeClass}`} 
+        priority
+      />
     </div>
   );
 }

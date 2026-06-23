@@ -65,7 +65,7 @@ export default function LoginPage() {
       {/* Left Dark Panel */}
       <div className="hidden lg:flex flex-col justify-between w-[46%] xl:w-[42%] p-12 relative overflow-hidden" style={gridBg}>
         <div className="absolute inset-0 pointer-events-none" style={{background:'radial-gradient(ellipse 75% 75% at 25% 65%,rgba(29,78,216,0.09) 0%,transparent 65%)'}}/>
-        <div className="relative"><Logo/></div>
+        <div className="relative"><Logo size="lg"/></div>
         <div className="relative">
           <div className="flex items-center gap-2 mb-6"><PulseDot/><span className="text-[#F8FAFC] text-[11px] tracking-[0.18em] uppercase" style={{fontFamily:MONO}}>SISTEM AKTIF · 24/7</span></div>
           <h2 className="text-[44px] xl:text-[52px] font-black text-white leading-[0.9] mb-5 tracking-tight" style={{fontFamily:DISPLAY}}>KELOLA PEMINJAMAN<br/>ALAT LAB DENGAN<br/><span className="text-[#F8FAFC]">MUDAH & CEPAT</span></h2>

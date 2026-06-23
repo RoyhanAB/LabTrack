@@ -25,7 +25,6 @@ export interface RegisterData {
   password: string;
   nim: string;
   kelas?: string;
-  verificationCode: string;
 }
 
 export interface Laboratory {

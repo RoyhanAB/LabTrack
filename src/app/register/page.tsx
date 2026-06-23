@@ -3,7 +3,7 @@ import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, User, CheckCircle2, XCircle, Hash, ChevronRight, Users, GraduationCap, KeyRound } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, User, CheckCircle2, XCircle, Hash, ChevronRight, Users, GraduationCap } from 'lucide-react';
 import { useStore } from '@/lib/store';
 import { validateNIMTeknikIndustri, validatePasswordStrength } from '@/lib/auth';
 import { Logo, PulseDot, DISPLAY, BODY, MONO } from '@/components/landing/shared';
@@ -19,9 +19,6 @@ export default function RegisterPage() {
   const router = useRouter();
   const { register } = useStore();
   const [formData, setFormData] = useState({ name:'', email:'', nim:'', kelas:'', password:'', confirmPassword:'' });
-  const [verificationCode, setVerificationCode] = useState('');
-  const [codeSent, setCodeSent] = useState(false);
-  const [devCode, setDevCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -52,7 +49,7 @@ export default function RegisterPage() {
   const passwordMatch = useMemo(() => formData.confirmPassword ? formData.password === formData.confirmPassword : null, [formData.password, formData.confirmPassword]);
   const generatedEmail = useMemo(() => formData.nim.length === 10 ? `${formData.nim.trim()}@untirta.ac.id` : '', [formData.nim]);
 
-  const validateForm = (requireCode = false): boolean => {
+  const validateForm = (): boolean => {
     const e: Record<string,string> = {};
     if (!formData.name.trim()) e.name = 'Nama lengkap wajib diisi';
     if (formData.nim.length !== 10) e.nim = 'NIM harus 10 digit';
@@ -63,50 +60,13 @@ export default function RegisterPage() {
     else { const v = validatePasswordStrength(formData.password); if (!v.valid) e.password = v.error || 'Password tidak valid'; }
     if (!formData.confirmPassword) e.confirmPassword = 'Konfirmasi password wajib diisi';
     else if (formData.password !== formData.confirmPassword) e.confirmPassword = 'Password tidak cocok';
-    if (requireCode && !/^\d{6}$/.test(verificationCode.trim())) e.verificationCode = 'Kode verifikasi harus 6 digit';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const sendVerificationCode = async () => {
-    if (!validateForm(false)) return false;
-
-    setLoading(true);
-    try {
-      const response = await fetch('/api/register/send-code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: generatedEmail, nim: formData.nim.trim() })
-      });
-      const result = await response.json().catch(() => null);
-
-      if (!response.ok || !result?.success) {
-        const message = result?.error || 'Gagal mengirim kode verifikasi';
-        toast.error(message);
-        setErrors({ general: message });
-        return false;
-      }
-
-      setCodeSent(true);
-      setDevCode(result.devCode || '');
-      toast.success('Kode verifikasi dikirim ke email mahasiswa.');
-      return true;
-    } catch {
-      toast.error('Gagal mengirim kode verifikasi.');
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSubmit = async (ev: React.FormEvent) => {
     ev.preventDefault();
-    if (!codeSent) {
-      await sendVerificationCode();
-      return;
-    }
-
-    if (!validateForm(true)) return;
+    if (!validateForm()) return;
     setLoading(true);
     try {
       const result = await register({
@@ -115,7 +75,6 @@ export default function RegisterPage() {
         nim:formData.nim.trim(),
         kelas:formData.kelas||undefined,
         password:formData.password,
-        verificationCode: verificationCode.trim()
       });
       if (result.success) { toast.success('Registrasi berhasil! Silakan login.'); router.push('/login'); }
       else { toast.error(result.error||'Registrasi gagal'); setErrors({general:result.error||'Registrasi gagal'}); }
@@ -125,11 +84,6 @@ export default function RegisterPage() {
   const handleChange = (field:string, value:string) => {
     setFormData(prev => ({...prev,[field]:value}));
     if (errors[field]) setErrors(prev => { const n={...prev}; delete n[field]; return n; });
-    if (['name', 'nim', 'kelas', 'password', 'confirmPassword'].includes(field)) {
-      setCodeSent(false);
-      setVerificationCode('');
-      setDevCode('');
-    }
   };
 
   const handleNIMChange = (value:string) => {
@@ -151,7 +105,7 @@ export default function RegisterPage() {
       {/* Left Dark Panel */}
       <div className="hidden lg:flex flex-col justify-between w-[46%] xl:w-[42%] p-12 relative overflow-hidden" style={gridBg}>
         <div className="absolute inset-0 pointer-events-none" style={{background:'radial-gradient(ellipse 75% 75% at 25% 65%,rgba(29,78,216,0.09) 0%,transparent 65%)'}}/>
-        <div className="relative"><Logo/></div>
+        <div className="relative"><Logo size="lg"/></div>
         <div className="relative">
           <div className="flex items-center gap-2 mb-6"><PulseDot/><span className="text-[#F8FAFC] text-[11px] tracking-[0.18em] uppercase" style={{fontFamily:MONO}}>REGISTRASI MAHASISWA</span></div>
           <h2 className="text-[44px] xl:text-[52px] font-black text-white leading-[0.9] mb-5 tracking-tight" style={{fontFamily:DISPLAY}}>DAFTAR SEBAGAI<br/>MAHASISWA<br/><span className="text-[#F8FAFC]">TEKNIK INDUSTRI</span></h2>
@@ -216,36 +170,10 @@ export default function RegisterPage() {
                   {generatedEmail?<span>{formData.nim}<span className="text-[#1E3A8A] font-semibold">@untirta.ac.id</span></span>:'Isi NIM untuk generate email'}
                 </div>
               </div>
-              {generatedEmail && <p className="text-xs text-[#1E3A8A] mt-1 flex items-center gap-1"><CheckCircle2 className="w-3 h-3"/>Email akan digunakan untuk login dan menerima kode verifikasi</p>}
+              {generatedEmail && <p className="text-xs text-[#1E3A8A] mt-1 flex items-center gap-1"><CheckCircle2 className="w-3 h-3"/>Email akan digunakan untuk login</p>}
             </div>
 
-            {codeSent && (
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-sm font-medium text-slate-700 block" style={{fontFamily:BODY}}>Kode Verifikasi Email</label>
-                  <button type="button" onClick={sendVerificationCode} disabled={loading} className="text-xs font-semibold text-[#1E3A8A] hover:text-[#1E3A8A] disabled:opacity-60" style={{fontFamily:BODY}}>Kirim ulang</button>
-                </div>
-                <div className="relative">
-                  <KeyRound className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"/>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={verificationCode}
-                    onChange={e => {
-                      const code = e.target.value.replace(/\D/g, '').slice(0, 6);
-                      setVerificationCode(code);
-                      if (errors.verificationCode) setErrors(prev => { const n={...prev}; delete n.verificationCode; return n; });
-                    }}
-                    placeholder="Masukkan 6 digit kode"
-                    className={`w-full pl-11 pr-4 py-3 rounded-xl border ${errors.verificationCode?'border-red-300':'border-slate-200'} bg-white text-slate-900 text-sm tracking-[0.35em] focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/25 focus:border-[#1D4ED8] transition-all`}
-                    style={{fontFamily:MONO}}
-                  />
-                </div>
-                {errors.verificationCode && <p className="text-xs text-red-600 mt-1">{errors.verificationCode}</p>}
-                <p className="text-xs text-slate-500 mt-1">Kode berlaku 10 menit. Cek inbox atau spam email mahasiswa.</p>
-                {devCode && <p className="text-xs text-amber-600 mt-1">Mode development: kode test {devCode}</p>}
-              </div>
-            )}
+
 
             {/* Kelas */}
             {kelasOptions && (
@@ -292,7 +220,7 @@ export default function RegisterPage() {
             </div>
 
             <motion.button type="submit" disabled={loading} whileTap={{scale:0.98}} className="w-full py-3.5 rounded-xl bg-[#0F172A] hover:bg-[#1E293B] text-white font-semibold text-sm flex items-center justify-center gap-2.5 transition-all hover:shadow-lg disabled:opacity-60 mt-2" style={{fontFamily:BODY}}>
-              {loading?<span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"/>:<>{codeSent ? 'Verifikasi & Daftar' : 'Kirim Kode Verifikasi'} <ArrowRight className="w-4 h-4"/></>}
+              {loading?<span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"/>:<>Daftar <ArrowRight className="w-4 h-4"/></>}
             </motion.button>
           </form>
 
